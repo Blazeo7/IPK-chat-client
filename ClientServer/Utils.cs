@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Net;
+using System.Net.Sockets;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace ClientServer;
 
@@ -32,4 +30,23 @@ public class Utils {
     return str.Split("\0", StringSplitOptions.RemoveEmptyEntries);
   }
 
+  public static IPAddress ConvertHostname2IPv4(string hostname) {
+    IPAddress[] addresses = Dns.GetHostAddresses(hostname);
+
+    foreach (IPAddress address in addresses) {
+      if (address.AddressFamily == AddressFamily.InterNetwork) {
+        return address;
+      }
+    }
+
+    throw new SocketException();
+  }
+  
+  internal static class Counter {
+    private static short _count;
+
+    public static short GetNextValue() {
+      return ++_count;
+    }
+  }
 }
