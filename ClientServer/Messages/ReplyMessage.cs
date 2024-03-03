@@ -1,4 +1,6 @@
-﻿namespace ClientServer.Messages;
+﻿using ClientServer.Enums;
+
+namespace ClientServer.Messages;
 
 public class ReplyMessage(byte result, string content, short id = 0, short refMsgId = 0)
   : Message(id) {

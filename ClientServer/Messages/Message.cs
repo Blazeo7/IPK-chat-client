@@ -1,17 +1,8 @@
 ﻿using System.Text.RegularExpressions;
 using System.Text;
+using ClientServer.Enums;
 
 namespace ClientServer.Messages;
-
-public enum MsgType {
-  Confirm = 0x00,
-  Reply = 0x01,
-  Auth = 0x02,
-  Join = 0x03,
-  Msg = 0x04,
-  Err = 0xFE,
-  Bye = 0xFF,
-}
 
 public abstract class Message(short id) {
   public short MsgId { get; init; } = id;

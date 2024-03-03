@@ -1,4 +1,6 @@
-﻿namespace ClientServer.Messages;
+﻿using ClientServer.Enums;
+
+namespace ClientServer.Messages;
 
 public class AuthMessage(string username, string secret, string displayName, short id = 0)
   : Message(id) {

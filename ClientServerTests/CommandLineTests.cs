@@ -5,13 +5,14 @@ namespace ClientServerTests;
 
 public class CommandLineTests {
   [Theory,
-   InlineData(),
+   InlineData(""),
    InlineData("-t", "tcp"), // missing required -s
    InlineData("-s", "localhost"), // missing required -t
+   InlineData("-s", "localhost", "-t", "udp", "-p", "invalid port"), // invalid port number
   ]
   public void InvalidArgsTest(params string[] args) {
     // Act
-    var parseResult = Parser.Default.ParseArguments<Program.Options>(args)
+    var parseResult = Parser.Default.ParseArguments<CommandLineParser.Options>(args)
       .WithNotParsed(errors => { });
 
     // Assert
@@ -25,7 +26,7 @@ public class CommandLineTests {
     string[] args = ["-t", "tcp", "-s", "localhost"];
 
     // Act
-    var parseResult = Parser.Default.ParseArguments<Program.Options>(args)
+    var parseResult = Parser.Default.ParseArguments<CommandLineParser.Options>(args)
       .WithNotParsed(errors => { });
 
     // Assert

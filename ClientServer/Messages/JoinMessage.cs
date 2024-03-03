@@ -1,4 +1,6 @@
 ﻿
+using ClientServer.Enums;
+
 namespace ClientServer.Messages;
 public class JoinMessage(string channelId, string displayName, short id = 0) : Message(id) {
   public string ChannelId = channelId;

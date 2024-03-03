@@ -1,4 +1,6 @@
 ﻿
+using ClientServer.Enums;
+
 namespace ClientServer.Messages;
 public class ByeMessage(short id = 0) : Message(id) {
   public override MsgType MType { get; set; } = MsgType.Bye;

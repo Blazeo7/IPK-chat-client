@@ -1,4 +1,6 @@
 ﻿
+using ClientServer.Enums;
+
 namespace ClientServer.Messages;
 
 public class ErrorMessage(string content, string? displayName = null, short id = 0) : Message(id) {

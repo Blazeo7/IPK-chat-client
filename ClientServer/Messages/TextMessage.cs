@@ -1,4 +1,6 @@
-﻿namespace ClientServer.Messages;
+﻿using ClientServer.Enums;
+
+namespace ClientServer.Messages;
 
 public class TextMessage(string displayName, string content, short id = 0) : Message(id) {
   public string DisplayName = displayName;
