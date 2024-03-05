@@ -22,16 +22,29 @@ public class ChatClient(BaseClient client) {
     Client.SetUpConnection();
 
     // handle interruption signal Ctrl^C
-    Console.CancelKeyPress += async (sender, e) => await LeaveChat();
+    Console.CancelKeyPress += async (_, e) => {
+      // Prevent the default behavior (program termination)
+      e.Cancel = true;
 
-    while (CurrentState != State.End) {
-      await (CurrentState switch {
-        State.Start => StartState(),
-        State.Auth => AuthState(),
-        State.Open => OpenState(),
-        State.Error => ErrorState(),
-        _ => throw new UnreachableException("Invalid state"),
-      });
+      // Execute the LeaveChat function
+      await LeaveChat();
+
+      Environment.Exit(0);
+    };
+
+    try {
+      while (CurrentState != State.End) {
+        await (CurrentState switch {
+          State.Start => StartState(),
+          State.Auth => AuthState(),
+          State.Open => OpenState(),
+          State.Error => ErrorState(),
+          _ => throw new UnreachableException("Invalid state"),
+        });
+      }
+    } catch (SocketException e) {
+      Logger.Log("Socket exception: " + e.Message);
+      await LeaveChat();
     }
   }
 
