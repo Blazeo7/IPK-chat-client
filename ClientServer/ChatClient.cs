@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.Net.Sockets;
 using System.Text.RegularExpressions;
 using ClientServer.Clients;
 using ClientServer.Enums;
@@ -77,23 +78,35 @@ public class ChatClient(BaseClient client) {
 
       case MsgType.Err:
         await LeaveChat();
+        receiveMessage.Print();
         CurrentState = State.End;
         break;
 
       default:
-        await Client.SendMessage(new ErrorMessage(displayName: "Server",
-          content: "Invalid response from server"));
-        CurrentState = State.Error;
+        await TransitionToErrorState();
         break;
     }
   }
 
   /// <summary>
+  /// Prints and sends an error message to the server. Sets state to <see cref="State.Error"/>
+  /// </summary>
+  private async Task TransitionToErrorState() {
+    new ErrorMessage("Unexpected message from server").Print();
+
+    Message error = new ErrorMessage("Got invalid message", displayName: DisplayName,
+      id: Utils.Counter.GetNext());
+
+    await Client.SendMessage(error);
+    CurrentState = State.Error;
+  }
+
+  /// <summary>
   /// Allows user to send and receive messages from server at the same time. Move to next state
-  /// is only possible when <see cref="ReceiveInOpenState"/> task ends.
+  /// is only possible when <see cref="OpenStateReceiving"/> task ends.
   /// </summary>
   private async Task OpenState() {
-    var receiving = Task.Run(ReceiveInOpenState);
+    var receiving = Task.Run(OpenStateReceiving);
     var sending = Task.Run(SendInOpenState);
     await Task.WhenAny(receiving, sending);
   }
@@ -164,9 +177,7 @@ public class ChatClient(BaseClient client) {
           return;
 
         default:
-          await Client.SendMessage(new ErrorMessage(displayName: "Server",
-            content: "Invalid Message from server"));
-          CurrentState = State.Error;
+          await TransitionToErrorState();
           return;
       }
     }
@@ -187,45 +198,40 @@ public class ChatClient(BaseClient client) {
   /// </list>
   /// </returns>
   private Message GetUserInput() {
-    try {
-      while (true) {
-        string? input = Console.ReadLine()?.Trim();
+    while (true) {
+      string? input = Console.ReadLine()?.Trim();
 
-        // Interruption signal => do nothing (handled in another thread)
-        if (input == null) {
-          continue;
-        }
-
-        // Text message
-        if (!input.StartsWith('/')) {
-          return new TextMessage(DisplayName, input);
-        }
-
-        // Command
-        switch (input) {
-          case var _ when input.StartsWith(UserCommands.Help):
-            PrintHelpMessage();
-            break;
-
-          case var _ when input.StartsWith(UserCommands.Auth):
-            return HandleAuthCommand(input);
-
-          case var _ when input.StartsWith(UserCommands.Join):
-            return HandleJoinCommand(input);
-
-          case var _ when input.StartsWith(UserCommands.Rename):
-            HandleRenameCommand(input);
-            break;
-
-          default: // unknown command
-            Console.WriteLine($"Unknown command `{input}`");
-            PrintHelpMessage();
-            break;
-        }
+      // Interruption signal => do nothing (handled in another thread)
+      if (input == null) {
+        continue;
       }
-    } catch (IOException e) {
-      Console.WriteLine(e);
-      throw;
+
+      // Text message
+      if (!input.StartsWith('/')) {
+        return new TextMessage(DisplayName, content: input, id: Utils.Counter.GetNext());
+      }
+
+      // Command
+      switch (input) {
+        case var _ when input.StartsWith(UserCommands.Help):
+          PrintHelpMessage();
+          break;
+
+        case var _ when input.StartsWith(UserCommands.Auth):
+          return HandleAuthCommand(input);
+
+        case var _ when input.StartsWith(UserCommands.Join):
+          return HandleJoinCommand(input);
+
+        case var _ when input.StartsWith(UserCommands.Rename):
+          HandleRenameCommand(input);
+          break;
+
+        default: // unknown command
+          Console.Error.WriteLine($"Unknown command `{input}`");
+          PrintHelpMessage();
+          break;
+      }
     }
   }
 
@@ -256,7 +262,7 @@ public class ChatClient(BaseClient client) {
     var password = authMatch.Groups[2].Value;
     DisplayName = authMatch.Groups[3].Value;
 
-    return new AuthMessage(username, password, DisplayName, Utils.Counter.GetNextValue());
+    return new AuthMessage(username, password, DisplayName, Utils.Counter.GetNext());
   }
 
   /// <summary>
@@ -275,11 +281,11 @@ public class ChatClient(BaseClient client) {
     var joinMatch = Regex.Match(input, joinPattern);
 
     if (!joinMatch.Success) {
-      return new ErrorMessage("Invalid /join command syntax");
+      return new ErrorMessage(content: "Invalid /join command syntax");
     }
 
     var channelId = joinMatch.Groups[1].Value;
-    return new JoinMessage(channelId, DisplayName, Utils.Counter.GetNextValue());
+    return new JoinMessage(channelId, DisplayName, Utils.Counter.GetNext());
   }
 
   /// <summary>
@@ -292,7 +298,7 @@ public class ChatClient(BaseClient client) {
     var renameMatch = Regex.Match(input, renamePattern);
 
     if (!renameMatch.Success) {
-      Console.WriteLine("Invalid syntax for /rename command");
+      new ErrorMessage("Invalid syntax for /rename command").Print();
       PrintHelpMessage();
       return;
     }
@@ -300,12 +306,12 @@ public class ChatClient(BaseClient client) {
     switch (CurrentState) {
       case State.Start:
       case State.Auth:
-        Console.WriteLine("Error: You are not logged in, please use /auth command");
+        new ErrorMessage("You are not logged in, please use /auth command").Print();
         break;
 
       default:
         DisplayName = renameMatch.Groups[1].Value;
-        Console.WriteLine($"Name changed to `{DisplayName}`");
+        Logger.Log($"Name changed to `{DisplayName}`");
         break;
     }
   }
@@ -314,7 +320,7 @@ public class ChatClient(BaseClient client) {
   /// Prints help message that shows the valid chat commands.
   /// </summary>
   private static void PrintHelpMessage() {
-    Console.WriteLine(
+    Console.Error.WriteLine(
       """
       Command    Parameters                        Using
       /auth      {Username} {Secret} {DisplayName} Sends AUTH message with the data provided from
