@@ -5,7 +5,11 @@ using System.Text;
 namespace ClientServer;
 
 public class Utils {
-  public static byte[] AsBytes(byte type, short id, params string[] parameters) {
+  /// <summary>
+  /// Create array of bytes from its parameters
+  /// </summary>
+  /// <returns>Byte array representing arguments values one after another</returns>
+  public static byte[] AsBytes(byte type, ushort id, params string[] parameters) {
     using MemoryStream stream = new();
     using BinaryWriter writer = new(stream);
 
@@ -24,12 +28,23 @@ public class Utils {
   }
 
 
-  // Find strings based on \0 separator in `data`
+  /// <summary>
+  /// Get array of strings from bytes.
+  /// </summary>
+  /// <param name="data">byte array that contains strings (separated by \0)</param>
+  /// <param name="index">Start of the first string</param>
+  /// <returns>Returns all strings from byte array based on \0 separator in <see cref="data"/></returns>
   public static string[] FromBytes(byte[] data, int index = 0) {
     string str = Encoding.UTF8.GetString(data, index, data.Length - index);
     return str.Split("\0", StringSplitOptions.RemoveEmptyEntries);
   }
 
+  /// <summary>
+  /// Convert <see cref="hostname"/> to IPv4 address
+  /// </summary>
+  /// <param name="hostname"></param>
+  /// <returns>IP address corresponding to the <see cref="hostname"/></returns>
+  /// <exception cref="SocketException"></exception>
   public static IPAddress ConvertHostname2IPv4(string hostname) {
     IPAddress[] addresses = Dns.GetHostAddresses(hostname);
 
@@ -42,10 +57,10 @@ public class Utils {
     throw new SocketException();
   }
   
-  internal static class Counter {
-    private static short _count;
+  public static class Counter {
+    private static ushort _count;
 
-    public static short GetNextValue() {
+    public static ushort GetNext() {
       return ++_count;
     }
   }
