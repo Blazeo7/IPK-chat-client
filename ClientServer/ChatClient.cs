@@ -54,11 +54,18 @@ public class ChatClient(BaseClient client) {
   /// changed to <see cref="State.Auth"/>. 
   /// </summary>
   private async Task StartState() {
-    var startMsg = GetUserInput();
-    switch (startMsg.MType) {
+    var message = GetUserInput();
+    switch (message.MType) {
       case MsgType.Auth:
-        await Client.SendMessage(startMsg);
-        CurrentState = State.Auth;
+        bool isSuccess = await Client.SendMessage(message);
+        if (isSuccess) {
+          CurrentState = State.Auth;
+        } else {
+          Logger.Log("Message not confirmed");
+          await LeaveChat();
+          Environment.Exit(1);
+        }
+
         break;
 
       default:
@@ -137,7 +144,8 @@ public class ChatClient(BaseClient client) {
   /// Gracefully leaves chat and end connection with server
   /// </summary>
   private async Task LeaveChat() {
-    await Client.SendMessage(new ByeMessage());
+    Logger.Log("Leaving");
+    await Client.SendMessage(new ByeMessage(id: Utils.Counter.GetNext()));
     Client.EndConnection();
   }
 
@@ -151,7 +159,13 @@ public class ChatClient(BaseClient client) {
       switch (message.MType) {
         case MsgType.Msg:
         case MsgType.Join:
-          await Client.SendMessage(message);
+          bool isSuccess = await Client.SendMessage(message);
+
+          if (!isSuccess) { // message was not received by the server
+            await LeaveChat();
+            CurrentState = State.End;
+          }
+
           break;
 
         case MsgType.Auth:
@@ -172,15 +186,17 @@ public class ChatClient(BaseClient client) {
   /// Allows user asynchronously receiving text messages from the server until. Server subscribing
   /// is interrupted when received message is not TextMessage.
   /// </summary>
-  private async Task ReceiveInOpenState() {
+  private async Task OpenStateReceiving() {
     while (true) {
       var openMessage = await Client.ReceiveMessage();
       switch (openMessage.MType) {
+        case MsgType.Reply:
         case MsgType.Msg:
           openMessage.Print();
           break;
 
         case MsgType.Err:
+          openMessage.Print();
           await LeaveChat();
           CurrentState = State.End;
           return;
