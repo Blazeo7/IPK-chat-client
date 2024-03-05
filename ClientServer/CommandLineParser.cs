@@ -19,10 +19,39 @@ public class CommandLineParser {
     [Option('r', Default = 3, Required = false,
       HelpText = "Maximum number of UDP retransmissions")]
     public int Retransmissions { get; set; }
+
+    [Option('v', Required = false, HelpText = "Verbose (prints logs to stderr")]
+    public bool Verbose { get; set; }
+
+    [Option('h', "help", HelpText = "Show this message and exit.")]
+    public bool ShowHelp { get; set; }
+  }
+
+  public static void HelpMessage() {
+    Console.Error.WriteLine(@"
+      -t           Required. Transport protocol used for connection
+
+      -s           Required. Server IP or hostname
+
+      -p           (Default: 4567) Server port
+
+      -d           (Default: 250) UDP confirmation timeout (ms)
+
+      -r           (Default: 3) Maximum number of UDP retransmissions
+
+      -v           Verbose (prints logs to stderr)
+
+      -h           Display this help screen.
+      ");
   }
 
   public static Options GetCommandLineArguments(string[] args) {
     ParserResult<Options> result = Parser.Default.ParseArguments<Options>(args);
+
+    if (result.Value.ShowHelp) {
+      HelpMessage();
+      Environment.Exit(1);
+    }
 
     result.WithNotParsed((errors) => Environment.Exit(1));
 

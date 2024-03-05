@@ -12,8 +12,15 @@ namespace ClientServer {
         _ => throw new ArgumentException("Invalid client name"),
       };
 
+      Logger.Init(options.Verbose);
+
       ChatClient chat = new(client);
-      await chat.Communicate();
+      try {
+        await chat.Communicate();
+      } catch (Exception e) {
+        Logger.Log(e.Message);
+        Environment.Exit(1);
+      }
     }
   }
 }
