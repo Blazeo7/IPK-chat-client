@@ -20,7 +20,6 @@ public class TcpClient(string hostname, ushort port) : BaseClient(hostname, port
     }
   }
 
-  // Shutdown and close the connection
   public override void EndConnection() {
     ClientSocket.Shutdown(SocketShutdown.Both);
     ClientSocket.Close();
@@ -29,32 +28,25 @@ public class TcpClient(string hostname, ushort port) : BaseClient(hostname, port
 
 
   public override async Task<Message> ReceiveMessage() {
-    try {
-      var buffer = new byte[256];
-      while (true) {
-        var bytesRead = await ClientSocket.ReceiveAsync(buffer);
+    var buffer = new byte[2048];
+    var bytesRead = await ClientSocket.ReceiveAsync(buffer);
 
-        if (bytesRead == 0) {
-          // Connection closed by the server
-          await Console.Error.WriteLineAsync("Server closed the connection.");
-          Environment.Exit(1);
-        }
-
-        // Process the received data
-        var receivedMessage = Encoding.UTF8.GetString(buffer);
-        return Message.FromTcpFormat(receivedMessage);
-      }
-    } catch (IOException e) {
-      Console.WriteLine(e);
-      throw;
+    if (bytesRead == 0) {
+      // Connection closed by the server
+      await Console.Error.WriteLineAsync("Server closed the connection.");
+      EndConnection();
+      throw new SocketException();
     }
+
+    // Process the received data
+    var receivedMessage = Encoding.UTF8.GetString(buffer).TrimEnd('\0');
+    return Message.FromTcpFormat(receivedMessage);
   }
 
-
-  public override async Task SendMessage(Message message) {
+  public override async Task<bool> SendMessage(Message message) {
     string tcpMessage = message.ToTcpFormat();
     byte[] data = Encoding.Default.GetBytes(tcpMessage);
-    //await Stream.WriteAsync(data);
     await ClientSocket.SendAsync(data);
+    return true;
   }
 }
