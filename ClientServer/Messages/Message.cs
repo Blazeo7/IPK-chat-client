@@ -4,8 +4,8 @@ using ClientServer.Enums;
 
 namespace ClientServer.Messages;
 
-public abstract class Message(short id) {
-  public short MsgId { get; init; } = id;
+public abstract class Message(ushort id) {
+  public ushort MsgId { get; init; } = id;
 
   public abstract MsgType MType { get; set; }
 
@@ -22,12 +22,8 @@ public abstract class Message(short id) {
   }
 
   public static Message FromUdpFormat(byte[] udpMessage) {
-    if (udpMessage.Length < 3) { // at least 3 bytes 
-      return new ErrorMessage("Server", "Server sent invalid message");
-    }
-
     MsgType type = (MsgType)udpMessage[0];
-    short msgId = BitConverter.ToInt16(udpMessage, 1);
+    ushort msgId = BitConverter.ToUInt16(udpMessage, 1);
 
     switch (type) {
       case MsgType.Confirm:
@@ -35,7 +31,7 @@ public abstract class Message(short id) {
 
       case MsgType.Reply:
         byte result = udpMessage[3];
-        short refMsgId = BitConverter.ToInt16(udpMessage, 4);
+        ushort refMsgId = BitConverter.ToUInt16(udpMessage, 4);
         var content = Encoding.UTF8.GetString(udpMessage, 6, udpMessage.Length - 6);
         return new ReplyMessage(result, content, msgId, refMsgId);
 
@@ -76,13 +72,14 @@ public abstract class Message(short id) {
         return new ByeMessage(msgId);
 
       default:
-        throw new ArgumentOutOfRangeException();
+        return new ErrorMessage(displayName: "Server",
+          content: $"Invalid message code: `{udpMessage[0]}`");
     }
   }
 
   public static Message FromTcpFormat(string tcpMessage) {
     // MSG
-    var msgMatch = Regex.Match(tcpMessage, @"^MSG FROM ([!-~]+) IS ([ -~]+)$",
+    var msgMatch = Regex.Match(tcpMessage, @"^MSG FROM ([!-~]+) IS ([ -~]+)\r\n$",
       RegexOptions.Multiline);
     if (msgMatch.Success) {
       string displayName = msgMatch.Groups[1].Value;
@@ -92,7 +89,7 @@ public abstract class Message(short id) {
 
     // REPLY
     var replyMatch =
-      Regex.Match(tcpMessage, @"^REPLY (OK|NOK) IS ([ -~]+)$", RegexOptions.Multiline);
+      Regex.Match(tcpMessage, @"^REPLY (OK|NOK) IS ([ -~]+)\r\n$", RegexOptions.Multiline);
     if (replyMatch.Success) {
       string replyResult = replyMatch.Groups[1].Value;
       string msgContent = replyMatch.Groups[2].Value;
@@ -105,7 +102,7 @@ public abstract class Message(short id) {
     }
 
     // ERR
-    var errMatch = Regex.Match(tcpMessage, @"^ERROR FROM ([!-~]+) IS ([ -~]+)$",
+    var errMatch = Regex.Match(tcpMessage, @"^ERR FROM ([!-~]+) IS ([ -~]+)\r\n$",
       RegexOptions.Multiline);
     if (errMatch.Success) {
       string displayName = errMatch.Groups[1].Value;
@@ -114,11 +111,11 @@ public abstract class Message(short id) {
     }
 
     // BYE
-    var byeMatch = Regex.Match(tcpMessage, @"^BYE$", RegexOptions.Multiline);
+    var byeMatch = Regex.Match(tcpMessage, @"^BYE\r\n$", RegexOptions.Multiline);
     if (byeMatch.Success) {
       return new ByeMessage();
     }
 
-    return new ErrorMessage("Server", "Invalid message from server");
+    return new ErrorMessage($"`{tcpMessage}`", displayName: "Server");
   }
 }

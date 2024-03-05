@@ -2,10 +2,10 @@
 
 namespace ClientServer.Messages;
 
-public class ReplyMessage(byte result, string content, short id = 0, short refMsgId = 0)
+public class ReplyMessage(byte result, string content, ushort id = 0, ushort refMsgId = 0)
   : Message(id) {
   public byte Result = result;
-  public short RefMsgId = refMsgId;
+  public ushort RefMsgId = refMsgId;
   public string Content = content;
   public override MsgType MType { get; set; } = MsgType.Reply;
 

@@ -2,7 +2,7 @@
 
 namespace ClientServer.Messages;
 
-public class TextMessage(string displayName, string content, short id = 0) : Message(id) {
+public class TextMessage(string displayName, string content, ushort id = 0) : Message(id) {
   public string DisplayName = displayName;
   public string Content = content;
 

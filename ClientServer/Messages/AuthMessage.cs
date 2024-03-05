@@ -2,7 +2,7 @@
 
 namespace ClientServer.Messages;
 
-public class AuthMessage(string username, string secret, string displayName, short id = 0)
+public class AuthMessage(string username, string secret, string displayName, ushort id = 0)
   : Message(id) {
   public string Username = username;
   public string Secret = secret;

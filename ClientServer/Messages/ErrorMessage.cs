@@ -3,7 +3,7 @@ using ClientServer.Enums;
 
 namespace ClientServer.Messages;
 
-public class ErrorMessage(string content, string? displayName = null, short id = 0) : Message(id) {
+public class ErrorMessage(string content, string? displayName = null, ushort id = 0) : Message(id) {
   public string? DisplayName = displayName;
   public string Content = content;
   public override MsgType MType { get; set; } = MsgType.Err;
@@ -13,12 +13,12 @@ public class ErrorMessage(string content, string? displayName = null, short id =
   }
 
   public override string ToTcpFormat() {
-    return $"ERROR FROM {DisplayName!} IS {Content}\r\n";
+    return $"ERR FROM {DisplayName!} IS {Content}\r\n";
   }
 
   public override void Print() {
     Console.Error.WriteLine(DisplayName == null
-      ? $"ERROR: {Content}"
-      : $"ERROR FROM {DisplayName}: {Content}");
+      ? $"ERR: {Content}"
+      : $"ERR FROM {DisplayName}: {Content}");
   }
 }

@@ -2,7 +2,7 @@
 using ClientServer.Enums;
 
 namespace ClientServer.Messages;
-public class JoinMessage(string channelId, string displayName, short id = 0) : Message(id) {
+public class JoinMessage(string channelId, string displayName, ushort id = 0) : Message(id) {
   public string ChannelId = channelId;
   public string DisplayName = displayName;
   public override MsgType MType { get; set; } = MsgType.Join;
