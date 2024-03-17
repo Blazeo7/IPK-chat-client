@@ -28,18 +28,10 @@ public class TcpClient(string hostname, ushort port) : BaseClient(hostname, port
 
 
   public override async Task<Message> ReceiveMessage() {
-    var buffer = new byte[2048];
-    var bytesRead = await ClientSocket.ReceiveAsync(buffer);
+    byte[] buffer = new byte[2048];
+    await ClientSocket.ReceiveAsync(buffer);
 
-    if (bytesRead == 0) {
-      // Connection closed by the server
-      await Console.Error.WriteLineAsync("Server closed the connection.");
-      EndConnection();
-      throw new SocketException();
-    }
-
-    // Process the received data
-    var receivedMessage = Encoding.UTF8.GetString(buffer).TrimEnd('\0');
+    string receivedMessage = Encoding.UTF8.GetString(buffer).TrimEnd('\0');
     return Message.FromTcpFormat(receivedMessage);
   }
 
