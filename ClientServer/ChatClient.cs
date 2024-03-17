@@ -35,8 +35,6 @@ public class ChatClient {
 
       // Execute the LeaveChat function
       await LeaveChat();
-
-      Environment.Exit(0);
     };
 
     try {
@@ -70,7 +68,6 @@ public class ChatClient {
         } else {
           Logger.Log("Message not confirmed");
           await LeaveChat();
-          Environment.Exit(1);
         }
 
         break;
@@ -126,8 +123,6 @@ public class ChatClient {
 
       case MsgType.Err:
         await LeaveChat();
-        receiveMessage.Print();
-        CurrentState = State.End;
         break;
 
       case MsgType.Bye:
@@ -170,16 +165,29 @@ public class ChatClient {
   /// </summary>
   private async Task ErrorState() {
     await LeaveChat();
-    CurrentState = State.End;
   }
 
   /// <summary>
   /// Gracefully leaves chat and end connection with server
   /// </summary>
   private async Task LeaveChat() {
+    // avoid calling this function multiple times from each thread
+
+    await Task.Run(_leaveAccessEvent.WaitOne);
+    if (_chatInfo.Connected) {
+      _chatInfo.Connected = false;
+
+      if (_chatInfo.CurrentState != State.Start) {
     Logger.Log("Leaving");
-    await Client.SendMessage(new ByeMessage(id: Utils.Counter.GetNext()));
+        await Client.SendMessage(new ByeMessage(Id: Utils.Counter.GetNext()));
+      }
+
+      _leaveAccessEvent.Set();
+      _replyAccessEvent.Dispose();
     Client.EndConnection();
+      _leaveAccessEvent.Dispose();
+      Environment.Exit(0);
+    }
   }
 
   /// <summary>
