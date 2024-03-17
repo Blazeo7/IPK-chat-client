@@ -8,7 +8,7 @@ public record ErrorMessage(string Content, string DisplayName, ushort Id = 0)
   public override MsgType MType { get; set; } = MsgType.Err;
 
   public override byte[] ToUdpFormat() {
-    return Utils.AsBytes((byte)MsgType.Err, MsgId, DisplayName!, Content);
+    return Utils.AsBytes([(byte)MsgType.Err, Id], DisplayName, Content);
   }
 
   public override string ToTcpFormat() {

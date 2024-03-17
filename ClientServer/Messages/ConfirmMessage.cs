@@ -7,12 +7,6 @@ public record ConfirmMessage(ushort Id = 0) : Message(Id) {
   public override MsgType MType { get; set; } = MsgType.Confirm;
 
   public override byte[] ToUdpFormat() {
-    return Utils.AsBytes((byte)MsgType.Confirm, MsgId);
+    return Utils.AsBytes([(byte)MsgType.Confirm, Id]);
   }
-
-  // Tcp does not use Confirmation messages
-  public override string ToTcpFormat() {
-    throw new NotImplementedException();
-  }
-
 }

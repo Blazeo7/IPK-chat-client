@@ -6,11 +6,10 @@ public record JoinMessage(string ChannelId, string DisplayName, ushort Id = 0) :
   public override MsgType MType { get; set; } = MsgType.Join;
 
   public override byte[] ToUdpFormat() {
-    return Utils.AsBytes((byte)MsgType.Join, MsgId, ChannelId, DisplayName);
+    return Utils.AsBytes([(byte)MsgType.Join, Id], ChannelId, DisplayName);
   }
 
   public override string ToTcpFormat() {
     return $"JOIN {ChannelId} AS {DisplayName}\r\n";
   }
-
 }

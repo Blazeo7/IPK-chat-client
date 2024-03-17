@@ -10,12 +10,13 @@ public class Utils {
   /// Create array of bytes from its parameters
   /// </summary>
   /// <returns>Byte array representing arguments values one after another</returns>
-  public static byte[] AsBytes(byte type, ushort id, params string[] parameters) {
+  public static byte[] AsBytes(dynamic[] primitiveObjects, params string[] parameters) {
     using MemoryStream stream = new();
     using BinaryWriter writer = new(stream);
 
-    writer.Write(type);
-    writer.Write(id);
+    foreach (var primitive in primitiveObjects) {
+      writer.Write(primitive);
+    }
 
     // Write values to the stream
     foreach (var param in parameters) {

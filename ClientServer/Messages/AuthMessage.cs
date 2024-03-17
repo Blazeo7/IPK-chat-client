@@ -7,7 +7,7 @@ public record AuthMessage(string Username, string Secret, string DisplayName, us
   public override MsgType MType { get; set; } = MsgType.Auth;
 
   public override byte[] ToUdpFormat() {
-    return Utils.AsBytes((byte)MsgType.Auth, MsgId, Username, Secret, DisplayName);
+    return Utils.AsBytes([(byte)MsgType.Auth, Id], Username, DisplayName, Secret);
   }
 
   public override string ToTcpFormat() {
