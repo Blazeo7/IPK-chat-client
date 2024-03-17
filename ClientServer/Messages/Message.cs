@@ -42,6 +42,8 @@ public abstract record Message(ushort Id) {
         if (authParams.Length != 3) // 3 arguments expected for \auth
           return new InvalidMessage(Id: msgId, Content: "Server sent invalid message");
 
+        return new AuthMessage(authParams[0], authParams[2], authParams[1], msgId);
+
       case MsgType.Join:
         string[] joinParams = Utils.FromBytes(udpMessage, 3);
         if (joinParams.Length != 2) // 2 arguments expected for \join
