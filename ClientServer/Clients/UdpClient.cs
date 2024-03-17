@@ -11,7 +11,7 @@ public class UdpClient(string hostname, ushort port, int timeout, int retries)
   private readonly Queue<Message> _receivedMessages = new(5); // the 5 last received message
   private int? _msgToBeConfirm; // id of the message that has to be confirmed
   private int? _expectedReplyId; // id of the message that reply has to refer
-  private readonly ManualResetEvent _receiveAccessEvent = new(false);
+  private readonly AutoResetEvent _receiveAccessEvent = new(false);
   private readonly ManualResetEvent _confirmAccessEvent = new(false);
 
   public override void SetUpConnection() {
@@ -77,7 +77,7 @@ public class UdpClient(string hostname, ushort port, int timeout, int retries)
         _receiveAccessEvent.Set(); // Notify `ReceiveMessage` method
       }
     }
-          }
+  }
 
   /// <summary>
   /// Check if the <see cref="recMessage"/> refer to the correct message (last sent).
