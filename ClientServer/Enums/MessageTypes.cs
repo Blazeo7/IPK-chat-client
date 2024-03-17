@@ -8,4 +8,5 @@ public enum MsgType {
   Msg = 0x04,
   Err = 0xFE,
   Bye = 0xFF,
+  Invalid = 0x99,
 }

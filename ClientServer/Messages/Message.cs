@@ -1,5 +1,4 @@
 ﻿using System.Text.RegularExpressions;
-using System.Text;
 using ClientServer.Enums;
 
 namespace ClientServer.Messages;
@@ -33,36 +32,36 @@ public abstract record Message(ushort Id) {
         var content = Encoding.UTF8.GetString(udpMessage, 6, udpMessage.Length - 6);
         return new ReplyMessage(result, content, msgId, refMsgId);
 
+        if (replyParams.Length != 1)
+          return new InvalidMessage(Id: msgId, Content: "Invalid reply message");
+
+        return new ReplyMessage(Utils.ReplyResultFromInt(result), replyParams[0], msgId, refMsgId);
+
       case MsgType.Auth:
         string[] authParams = Utils.FromBytes(udpMessage, 3);
-        if (authParams.Length != 3) { // 3 arguments expected for \auth
-          return new ErrorMessage("Server", "Server sent invalid message");
-        }
 
-        return new AuthMessage(authParams[0], authParams[1], authParams[2], msgId);
+        if (authParams.Length != 3) // 3 arguments expected for \auth
+          return new InvalidMessage(Id: msgId, Content: "Server sent invalid message");
 
       case MsgType.Join:
         string[] joinParams = Utils.FromBytes(udpMessage, 3);
-        if (joinParams.Length != 2) { // 2 arguments expected for \join
-          return new ErrorMessage("Server", "Server sent invalid message");
-        }
+        if (joinParams.Length != 2) // 2 arguments expected for \join
+          return new InvalidMessage(Id: msgId, Content: "Server sent invalid message");
 
         return new JoinMessage(joinParams[0], joinParams[1], msgId);
 
       case MsgType.Msg:
         string[] msgParams = Utils.FromBytes(udpMessage, 3);
-        if (msgParams.Length != 2) { // 2 arguments expected for text message
-          return new ErrorMessage("Server", "Server sent invalid message");
-        }
+        if (msgParams.Length != 2) // 2 arguments expected for text message
+          return new InvalidMessage(Id: msgId, Content: "Server sent invalid message");
 
         return new TextMessage(msgParams[0], msgParams[1], msgId);
 
 
       case MsgType.Err:
         string[] errParams = Utils.FromBytes(udpMessage, 3);
-        if (errParams.Length != 2) { // 2 arguments expected for text message
-          return new ErrorMessage("Server", "Server sent invalid message");
-        }
+        if (errParams.Length != 2) // 2 arguments expected for text message
+          return new InvalidMessage(Id: msgId, Content: "Server sent invalid message");
 
         return new ErrorMessage(errParams[0], errParams[1], msgId);
 
@@ -70,8 +69,7 @@ public abstract record Message(ushort Id) {
         return new ByeMessage(msgId);
 
       default:
-        return new ErrorMessage(displayName: "Server",
-          content: $"Invalid message code: `{udpMessage[0]}`");
+        return new InvalidMessage(Id: msgId, Content: $"code: {udpMessage[0]}");
     }
   }
 
@@ -88,6 +86,7 @@ public abstract record Message(ushort Id) {
     // REPLY
     var replyMatch =
       Regex.Match(tcpMessage, @"^REPLY (OK|NOK) IS ([ -~]+)\r\n$", RegexOptions.Multiline);
+
     if (replyMatch.Success) {
       string replyResult = replyMatch.Groups[1].Value;
       string msgContent = replyMatch.Groups[2].Value;
@@ -114,6 +113,6 @@ public abstract record Message(ushort Id) {
       return new ByeMessage();
     }
 
-    return new ErrorMessage($"`{tcpMessage}`", displayName: "Server");
+    return new InvalidMessage("INVALID MESSAGE");
   }
 }
