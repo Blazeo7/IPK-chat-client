@@ -239,6 +239,7 @@ public class ChatClient {
   /// is interrupted when received message is not TextMessage.
   /// </summary>
   private async Task OpenStateReceiving() {
+    try {
     while (true) {
         Message message = await Client.ReceiveMessage();
 
@@ -273,6 +274,10 @@ public class ChatClient {
           return;
       }
     }
+    } catch (SocketException) {
+      Logger.Log("Server disconnected");
+      Client.EndConnection();
+      _chatInfo.CurrentState = State.End;
   }
   }
 
