@@ -23,12 +23,13 @@ public class CommandLineParser {
     [Option('v', Required = false, HelpText = "Verbose (prints logs to stderr")]
     public bool Verbose { get; set; }
 
-    [Option('h', "help", HelpText = "Show this message and exit.")]
+    [Option('h', HelpText = "Display this help screen.")]
     public bool ShowHelp { get; set; }
   }
 
-  public static void HelpMessage() {
-    Console.Error.WriteLine(@"
+  private static void HelpMessage() {
+    Console.Error.WriteLine(
+      """
       -t           Required. Transport protocol used for connection
 
       -s           Required. Server IP or hostname
@@ -42,18 +43,22 @@ public class CommandLineParser {
       -v           Verbose (prints logs to stderr)
 
       -h           Display this help screen.
-      ");
+      """);
   }
 
   public static Options GetCommandLineArguments(string[] args) {
     ParserResult<Options> result = Parser.Default.ParseArguments<Options>(args);
 
-    if (result.Value.ShowHelp) {
+    result.WithNotParsed((_) => {
+        Environment.Exit(1);
+      }
+    );
+
+    if (result.Value.ShowHelp || (result.Value.Client != "tcp" && result.Value.Client != "udp")) {
+      Utils.PrintInternalError("Invalid client name. Use either `tcp` or `udp` client");
       HelpMessage();
       Environment.Exit(1);
     }
-
-    result.WithNotParsed((errors) => Environment.Exit(1));
 
     return result.Value;
   }
