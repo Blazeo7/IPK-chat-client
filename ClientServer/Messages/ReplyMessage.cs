@@ -8,6 +8,18 @@ public record ReplyMessage(ReplyResult Result, string Content, ushort Id = 0, us
   public ushort RefMsgId { get; set; } = RefMsgId;
   public override MsgType MType { get; set; } = MsgType.Reply;
 
+  public override string ToTcpFormat() {
+    return Result switch {
+      ReplyResult.Ok => $"REPLY OK IS {Content}\r\n",
+      ReplyResult.Nok => $"REPLY NOK IS {Content}\r\n",
+      _ => $"REPLY INVALID IS {Content}\r\n"
+    };
+  }
+
+  public override byte[] ToUdpFormat() {
+    return Utils.AsBytes([(byte)MsgType.Reply, Id, (byte)Result, RefMsgId], Content);
+  }
+
   public override void Print() {
     switch (Result) {
       case ReplyResult.Ok:
