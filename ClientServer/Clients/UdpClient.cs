@@ -17,6 +17,7 @@ public class UdpClient(string hostname, ushort port, int timeout, int retries)
   public override void SetUpConnection() {
     try {
       ClientSocket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
+      ClientSocket.Bind(new IPEndPoint(IPAddress.Any, 0));
 
       IPAddress ipv4 = Utils.ConvertHostname2IPv4(HostName);
       _remoteIpEndPoint = new IPEndPoint(ipv4, Port);
