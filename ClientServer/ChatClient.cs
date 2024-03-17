@@ -59,7 +59,7 @@ public class ChatClient {
   /// changed to <see cref="State.Auth"/>. 
   /// </summary>
   private async Task StartState() {
-    var message = GetUserInput();
+    var message = await GetUserInput();
     switch (message.MType) {
       case MsgType.Auth:
         bool isSuccess = await Client.SendMessage(message);
@@ -154,9 +154,12 @@ public class ChatClient {
   /// is only possible when <see cref="OpenStateReceiving"/> task ends.
   /// </summary>
   private async Task OpenState() {
-    var receiving = Task.Run(OpenStateReceiving);
-    var sending = Task.Run(SendInOpenState);
-    await Task.WhenAny(receiving, sending);
+    // Start two tasks
+    Task receivingTask = Task.Run(OpenStateReceiving);
+    Task sendingTask = Task.Run(OpenStateSending);
+
+    // Wait for any task to complete
+    await Task.WhenAny(receivingTask, sendingTask);
   }
 
 
@@ -193,9 +196,9 @@ public class ChatClient {
   /// <summary>
   /// Allow sending messages to server nonstop until it is not killed by other the thread.
   /// </summary>
-  private async Task SendInOpenState() {
+  private async Task OpenStateSending() {
     while (true) {
-      Message message = GetUserInput();
+      Message message = await GetUserInput();
 
       switch (message.MType) {
         case MsgType.Msg:
@@ -271,21 +274,15 @@ public class ChatClient {
       }
     }
   }
+  }
 
 
   /// <summary>
   /// Read lines from the standard input until the message meant to be sent to the server is not
   /// read. Commands are processed internally. 
   /// </summary>
-  /// <returns>
-  /// <list type="bullet">
-  ///     <item><see cref="AuthMessage"/>: /auth command </item>
-  ///     <item><see cref="JoinMessage"/>: /join command</item>
-  ///     <item><see cref="ErrorMessage"/>: invalid command (starts with `/`)</item>
-  ///     <item><see cref="TextMessage"/>: if user did not write any command</item>
-  /// </list>
-  /// </returns>
-  private Message GetUserInput() {
+  /// <returns>The message to be sent to the server.</returns>
+  private async Task<Message> GetUserInput() {
     while (true) {
       string? input = Console.ReadLine()?.Trim();
 
