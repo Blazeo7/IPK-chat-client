@@ -100,14 +100,39 @@ public class ChatClient {
       case MsgType.Reply:
         // REPLY OK => State = Open 
         // REPLY NOK => State = Start
-        CurrentState = ((ReplyMessage)receiveMessage).Result == 1 ? State.Open : State.Start;
+        ReplyResult result = ((ReplyMessage)receiveMessage).Result;
+
+        switch (result) {
+          case ReplyResult.Ok:
+            _chatInfo.CurrentState = State.Open;
         receiveMessage.Print();
         break;
+
+          case ReplyResult.Nok:
+            receiveMessage.Print();
+            await StartState();
+            break;
+
+          case ReplyResult.Invalid:
+            await TransitionToErrorState();
+            break;
+
+          default:
+            throw new ArgumentOutOfRangeException();
+        }
+
+        break;
+
 
       case MsgType.Err:
         await LeaveChat();
         receiveMessage.Print();
         CurrentState = State.End;
+        break;
+
+      case MsgType.Bye:
+        Client.EndConnection();
+        _chatInfo.CurrentState = State.End;
         break;
 
       default:
@@ -166,14 +191,22 @@ public class ChatClient {
 
       switch (message.MType) {
         case MsgType.Msg:
-        case MsgType.Join:
-          bool isSuccess = await Client.SendMessage(message);
+          bool isMsgSent = await Client.SendMessage(message);
 
-          if (!isSuccess) { // message was not received by the server
+          if (!isMsgSent) { // message was not received by the server
             await LeaveChat();
-            CurrentState = State.End;
           }
 
+          break;
+
+        case MsgType.Join:
+          bool isJoinSent = await Client.SendMessage(message);
+          if (!isJoinSent) { // message was not received by the server
+            await LeaveChat();
+          }
+
+          _chatInfo.ReplyExpected = true;
+          await Task.Run(_replyAccessEvent.WaitOne);
           break;
 
         case MsgType.Auth:
@@ -196,15 +229,26 @@ public class ChatClient {
   /// </summary>
   private async Task OpenStateReceiving() {
     while (true) {
-      var openMessage = await Client.ReceiveMessage();
-      switch (openMessage.MType) {
+        Message message = await Client.ReceiveMessage();
+
+        switch (message.MType) {
+          case MsgType.Msg:
+            message.Print();
+            break;
+
         case MsgType.Reply:
-        case MsgType.Msg:
-          openMessage.Print();
+            if (!_chatInfo.ReplyExpected) {
+              await TransitionToErrorState();
+              return;
+            }
+
+            _chatInfo.ReplyExpected = false;
+            _replyAccessEvent.Set();
+            message.Print();
           break;
 
         case MsgType.Err:
-          openMessage.Print();
+            message.Print();
           await LeaveChat();
           return;
 
