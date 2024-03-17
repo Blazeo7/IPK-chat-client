@@ -1,14 +1,14 @@
-﻿using ClientServer.Messages;
+﻿using ClientServer.Enums;
+using ClientServer.Messages;
 
 namespace ClientServerTests;
 
-public class YourClassTests {
+public class MessagePrintingTests {
   public static IEnumerable<object[]> TestPrintToStderr() {
   // @formatter:off
-    yield return [new ErrorMessage(displayName: "TestUser", content: "test message"), "ERROR FROM TestUser: test message"];
-    yield return [new ErrorMessage(content: "test message"), "ERR: test message"];
-    yield return [new ReplyMessage(1, content: "OK"), "Success: OK"];
-    yield return [new ReplyMessage(0, content: "NOK"), "Failure: NOK"];
+    yield return [new ErrorMessage(DisplayName: "TestUser", Content: "test message"), "ERR FROM TestUser: test message"];
+    yield return [new ReplyMessage(ReplyResult.Ok, Content: "OK"), "Success: OK"];
+    yield return [new ReplyMessage(ReplyResult.Nok, Content: "NOK"), "Failure: NOK"];
     // @formatter:on
   }
 
