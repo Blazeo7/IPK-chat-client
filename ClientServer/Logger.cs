@@ -16,16 +16,13 @@ public class Logger {
     _verbose = verbose;
   }
 
-  /// <summary>
-  /// Logs a message to the console if verbosity is enabled.
-  /// </summary>
-  /// <param name="msg">The message to be logged.</param>
-  /// <param name="message">Prints its type and id</param>
-  public static void Log(string msg, Message? message = null) {
+  public static void Log(string msg) {
     if (!_verbose) return;
+    Console.Error.WriteLine($">>> {msg}");
+  }
 
-    Console.Error.WriteLine(message == null
-      ? $">>> {msg}"
-      : $">>> [{message.MType}:{message.MsgId}] {msg}");
+  public static void Log(string msg, Message message) {
+    if (!_verbose) return;
+    Console.Error.WriteLine($">>> [{message.MType}:{message.Id}] {msg}");
   }
 }
