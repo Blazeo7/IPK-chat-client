@@ -20,7 +20,7 @@ public class ChatClient(BaseClient client) {
   /// </summary>
   public async Task Communicate() {
     Client.SetUpConnection();
-
+    _chatInfo.Connected = true;
     // handle interruption signal Ctrl^C
     Console.CancelKeyPress += async (_, e) => {
       // Prevent the default behavior (program termination)
@@ -33,8 +33,8 @@ public class ChatClient(BaseClient client) {
     };
 
     try {
-      while (CurrentState != State.End) {
-        await (CurrentState switch {
+      while (_chatInfo.CurrentState != State.End) {
+        await (_chatInfo.CurrentState switch {
           State.Start => StartState(),
           State.Auth => AuthState(),
           State.Open => OpenState(),
@@ -59,7 +59,7 @@ public class ChatClient(BaseClient client) {
       case MsgType.Auth:
         bool isSuccess = await Client.SendMessage(message);
         if (isSuccess) {
-          CurrentState = State.Auth;
+          _chatInfo.CurrentState = State.Auth;
         } else {
           Logger.Log("Message not confirmed");
           await LeaveChat();
@@ -88,6 +88,7 @@ public class ChatClient(BaseClient client) {
   /// </summary>
   private async Task AuthState() {
     var receiveMessage = await Client.ReceiveMessage();
+
     switch (receiveMessage.MType) {
       case MsgType.Reply:
         // REPLY OK => State = Open 
@@ -118,7 +119,7 @@ public class ChatClient(BaseClient client) {
       Id: Utils.Counter.GetNext());
 
     await Client.SendMessage(error);
-    CurrentState = State.Error;
+    _chatInfo.CurrentState = State.Error;
   }
 
   /// <summary>
@@ -202,7 +203,8 @@ public class ChatClient(BaseClient client) {
           return;
 
         case MsgType.Bye:
-          CurrentState = State.End;
+            Client.EndConnection();
+            _chatInfo.CurrentState = State.End;
           return;
 
         default:
@@ -237,7 +239,7 @@ public class ChatClient(BaseClient client) {
 
       // Text message
       if (!input.StartsWith('/')) {
-        return new TextMessage(DisplayName, content: input, id: Utils.Counter.GetNext());
+        return new TextMessage(_chatInfo.DisplayName, Content: input, Id: Utils.Counter.GetNext());
       }
 
       // Command
