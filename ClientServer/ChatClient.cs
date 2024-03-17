@@ -114,8 +114,8 @@ public class ChatClient(BaseClient client) {
   private async Task TransitionToErrorState() {
     new ErrorMessage("Unexpected message from server").Print();
 
-    Message error = new ErrorMessage("Got invalid message", displayName: DisplayName,
-      id: Utils.Counter.GetNext());
+    Message error = new ErrorMessage("Got invalid message", DisplayName: _chatInfo.DisplayName,
+      Id: Utils.Counter.GetNext());
 
     await Client.SendMessage(error);
     CurrentState = State.Error;

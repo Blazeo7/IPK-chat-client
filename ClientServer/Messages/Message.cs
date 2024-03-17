@@ -63,7 +63,7 @@ public abstract record Message(ushort Id) {
         if (errParams.Length != 2) // 2 arguments expected for text message
           return new InvalidMessage(Id: msgId, Content: "Server sent invalid message");
 
-        return new ErrorMessage(errParams[0], errParams[1], msgId);
+        return new ErrorMessage(DisplayName: errParams[0], Content: errParams[1], Id: msgId);
 
       case MsgType.Bye:
         return new ByeMessage(msgId);

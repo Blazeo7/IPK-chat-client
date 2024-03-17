@@ -12,12 +12,10 @@ public record ErrorMessage(string Content, string DisplayName, ushort Id = 0)
   }
 
   public override string ToTcpFormat() {
-    return $"ERR FROM {DisplayName!} IS {Content}\r\n";
+    return $"ERR FROM {DisplayName} IS {Content}\r\n";
   }
 
   public override void Print() {
-    Console.Error.WriteLine(DisplayName == null
-      ? $"ERR: {Content}"
-      : $"ERR FROM {DisplayName}: {Content}");
+    Console.Error.WriteLine($"ERR FROM {DisplayName}: {Content}");
   }
 }
