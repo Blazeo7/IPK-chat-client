@@ -15,14 +15,14 @@ public abstract class BaseClient(string host, ushort port) : IClient {
   /// <summary>
   /// Remote hostname or IP address
   /// </summary>
-  public string HostName { get; set; } = host;
+  protected string HostName { get; set; } = host;
 
   /// <summary>
   /// Port where server is listening
   /// </summary>
-  public int Port { get; set; } = port;
+  protected int Port { get; set; } = port;
 
-  public Socket ClientSocket { get; set; } = null!;
+  protected Socket ClientSocket { get; set; } = null!;
 
   public abstract void SetUpConnection();
 
