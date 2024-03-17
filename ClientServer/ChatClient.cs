@@ -69,7 +69,7 @@ public class ChatClient(BaseClient client) {
         break;
 
       default:
-        new ErrorMessage(content: "You need to authenticate using valid /auth command").Print();
+        Utils.PrintInternalError("You need to authenticate using valid /auth command");
         break;
     }
   }
@@ -112,7 +112,7 @@ public class ChatClient(BaseClient client) {
   /// Prints and sends an error message to the server. Sets state to <see cref="State.Error"/>
   /// </summary>
   private async Task TransitionToErrorState() {
-    new ErrorMessage("Unexpected message from server").Print();
+    Utils.PrintInternalError("Invalid message from the server");
 
     Message error = new ErrorMessage("Got invalid message", DisplayName: _chatInfo.DisplayName,
       Id: Utils.Counter.GetNext());
@@ -169,7 +169,7 @@ public class ChatClient(BaseClient client) {
           break;
 
         case MsgType.Auth:
-          new ErrorMessage("You are already logged in").Print();
+          Utils.PrintInternalError("You are already logged in");
           break;
 
         case MsgType.Err:

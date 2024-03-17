@@ -15,7 +15,7 @@ public class TcpClient(string hostname, ushort port) : BaseClient(hostname, port
       ClientSocket.Connect(ipv4, Port);
 
     } catch (SocketException) {
-      Console.Error.WriteLine($"Cannot connect to {HostName}:{Port}");
+      Utils.PrintInternalError($"Cannot connect to {HostName}:{Port}");
       Environment.Exit(1);
     }
   }

@@ -23,7 +23,7 @@ public class UdpClient(string hostname, ushort port, int timeout, int retries)
 
       Task.Run(ContinuousReceiving);
     } catch (SocketException) {
-      new ErrorMessage($"Cannot connect to {HostName}:{Port}").Print();
+      Utils.PrintInternalError($"Cannot connect to {HostName}:{Port}");
       Environment.Exit(1);
     }
   }

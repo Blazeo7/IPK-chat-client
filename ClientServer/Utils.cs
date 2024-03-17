@@ -74,5 +74,8 @@ public class Utils {
       _ => ReplyResult.Invalid,
     };
   }
+
+  public static void PrintInternalError(string message) {
+    Console.Error.WriteLine($"ERR: {message}");
   }
 }
