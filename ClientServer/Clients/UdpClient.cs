@@ -43,6 +43,9 @@ public class UdpClient(string hostname, ushort port, int timeout, int retries)
       SocketReceiveFromResult receiveResult =
         await ClientSocket.ReceiveFromAsync(recBuffer, SocketFlags.None, _remoteIpEndPoint);
 
+      // Update remote address endpoint
+      _remoteIpEndPoint = receiveResult.RemoteEndPoint;
+
       // Ignore trash messages
       if (receiveResult.ReceivedBytes < 3) {
         continue;
@@ -98,10 +101,6 @@ public class UdpClient(string hostname, ushort port, int timeout, int retries)
 
     Logger.Log("Confirmed!", recMessage);
 
-    // Update remote address endpoint after the first message from the server
-    _remoteIpEndPoint = receiveResult.RemoteEndPoint;
-
-    // Update remote endpoint
     _msgToBeConfirm = null;
 
     // Notify `SendMessage` method about successful confirmation
