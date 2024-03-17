@@ -102,8 +102,8 @@ public class ChatClient {
         switch (result) {
           case ReplyResult.Ok:
             _chatInfo.CurrentState = State.Open;
-        receiveMessage.Print();
-        break;
+            receiveMessage.Print();
+            break;
 
           case ReplyResult.Nok:
             receiveMessage.Print();
@@ -181,13 +181,13 @@ public class ChatClient {
       _chatInfo.Connected = false;
 
       if (_chatInfo.CurrentState != State.Start) {
-    Logger.Log("Leaving");
+        Logger.Log("Leaving");
         await Client.SendMessage(new ByeMessage(Id: Utils.Counter.GetNext()));
       }
 
       _leaveAccessEvent.Set();
       _replyAccessEvent.Dispose();
-    Client.EndConnection();
+      Client.EndConnection();
       _leaveAccessEvent.Dispose();
       Environment.Exit(0);
     }
@@ -220,6 +220,7 @@ public class ChatClient {
           await Task.Run(_replyAccessEvent.WaitOne);
           break;
 
+
         case MsgType.Auth:
           Utils.PrintInternalError("You are already logged in");
           break;
@@ -240,7 +241,7 @@ public class ChatClient {
   /// </summary>
   private async Task OpenStateReceiving() {
     try {
-    while (true) {
+      while (true) {
         Message message = await Client.ReceiveMessage();
 
         switch (message.MType) {
@@ -248,7 +249,7 @@ public class ChatClient {
             message.Print();
             break;
 
-        case MsgType.Reply:
+          case MsgType.Reply:
             if (!_chatInfo.ReplyExpected) {
               await TransitionToErrorState();
               return;
@@ -257,28 +258,28 @@ public class ChatClient {
             _chatInfo.ReplyExpected = false;
             _replyAccessEvent.Set();
             message.Print();
-          break;
+            break;
 
-        case MsgType.Err:
+          case MsgType.Err:
             message.Print();
-          await LeaveChat();
-          return;
+            await LeaveChat();
+            return;
 
-        case MsgType.Bye:
+          case MsgType.Bye:
             Client.EndConnection();
             _chatInfo.CurrentState = State.End;
-          return;
+            return;
 
-        default:
-          await TransitionToErrorState();
-          return;
+          default:
+            await TransitionToErrorState();
+            return;
+        }
       }
-    }
     } catch (SocketException) {
       Logger.Log("Server disconnected");
       Client.EndConnection();
       _chatInfo.CurrentState = State.End;
-  }
+    }
   }
 
 
@@ -293,8 +294,11 @@ public class ChatClient {
 
       // End of stdin
       if (input == null) {
-        continue;
+        await LeaveChat();
       }
+
+      // Empty line => skip
+      if (input!.Length == 0) continue;
 
       // Text message
       if (!input.StartsWith('/')) {
@@ -306,7 +310,7 @@ public class ChatClient {
 
       if (message != null) {
         return message;
+      }
     }
-  }
   }
 }
