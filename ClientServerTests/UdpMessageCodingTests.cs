@@ -23,6 +23,13 @@ public class UdpMessageCoding {
     // @formatter:on
   }
 
+  public static IEnumerable<object[]> FromUdp_TestData() {
+    // @formatter:off
+    yield return [new InvalidMessage("Invalid reply message", 7),  // Invalid result
+                  new byte[] {0x1, 0x7, 0x0, 0x99, 0x02, 0x00, 0x65, 0x0,  0x4F, 0x4B, 0x0}];
+    // @formatter:on
+  }
+
   [Theory]
   [MemberData(nameof(CommonUdpTestData))]
   public void ToUdpFormat_ShouldReturnCorrectString(Message message, byte[] expected) {
@@ -35,7 +42,7 @@ public class UdpMessageCoding {
 
   [Theory]
   [MemberData(nameof(CommonUdpTestData))]
-    typeof(TextMessage))]
+  [MemberData(nameof(FromUdp_TestData))]
   public void FromUdpFormat_ShouldReturnCorrectMessageType(Message expectedMessage,
     byte[] udpMessage) {
     // Act
