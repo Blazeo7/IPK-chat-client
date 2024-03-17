@@ -1,6 +1,5 @@
 ﻿using System.Diagnostics;
 using System.Net.Sockets;
-using System.Text.RegularExpressions;
 using ClientServer.Clients;
 using ClientServer.Enums;
 using ClientServer.Messages;
@@ -142,7 +141,7 @@ public class ChatClient {
 
 
   /// <summary>
-  /// Leave chat and change state to <see cref="State.End"/>. 
+  /// End client connection and exit application
   /// </summary>
   private async Task ErrorState() {
     await LeaveChat();
@@ -207,7 +206,6 @@ public class ChatClient {
         case MsgType.Err:
           openMessage.Print();
           await LeaveChat();
-          CurrentState = State.End;
           return;
 
         case MsgType.Bye:
@@ -224,9 +222,8 @@ public class ChatClient {
 
 
   /// <summary>
-  /// Handles user input and returns a <see cref="Message"/> based on the provided input. The
-  /// local commands (/help or /rename) are handled internally. The function is called until
-  /// user typed /auth or /join command.
+  /// Read lines from the standard input until the message meant to be sent to the server is not
+  /// read. Commands are processed internally. 
   /// </summary>
   /// <returns>
   /// <list type="bullet">
@@ -240,7 +237,7 @@ public class ChatClient {
     while (true) {
       string? input = Console.ReadLine()?.Trim();
 
-      // Interruption signal => do nothing (handled in another thread)
+      // End of stdin
       if (input == null) {
         continue;
       }

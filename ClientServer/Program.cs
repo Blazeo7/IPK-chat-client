@@ -1,6 +1,7 @@
 ﻿using ClientServer.Clients;
 
-namespace ClientServer {
+namespace ClientServer;
+
   public class Program {
     public static async Task Main(string[] args) {
       CommandLineParser.Options options = CommandLineParser.GetCommandLineArguments(args);
@@ -23,5 +24,4 @@ namespace ClientServer {
         Environment.Exit(1);
       }
     }
-  }
-}
+  }

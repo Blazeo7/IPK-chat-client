@@ -10,10 +10,7 @@ public class TcpClient(string hostname, ushort port) : BaseClient(hostname, port
     try {
       ClientSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
       IPAddress ipv4 = Utils.ConvertHostname2IPv4(HostName);
-
-      // Connect to the server
       ClientSocket.Connect(ipv4, Port);
-
     } catch (SocketException) {
       Utils.PrintInternalError($"Cannot connect to {HostName}:{Port}");
       Environment.Exit(1);

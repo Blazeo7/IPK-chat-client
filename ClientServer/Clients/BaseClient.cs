@@ -24,29 +24,11 @@ public abstract class BaseClient(string host, ushort port) : IClient {
 
   public Socket ClientSocket { get; set; } = null!;
 
-  /// <summary>
-  /// Initialize <see cref="ClientSocket"/> for establishing a connection using the specified
-  /// transport protocol.
-  /// </summary>
   public abstract void SetUpConnection();
 
-
-  /// <summary>
-  /// Close the connection
-  /// </summary>
   public abstract void EndConnection();
 
-  /// <summary>
-  /// Sends message
-  /// </summary>
-  /// <param name="message">Message to be sent</param>
-  /// <returns>True if the message was received by receiver, otherwise false</returns>
   public abstract Task<bool> SendMessage(Message message);
 
-
-  /// <summary>
-  /// Gets message from the server
-  /// </summary>
-  /// <returns><see cref="Message"/> that represents the server message</returns>
   public abstract Task<Message> ReceiveMessage();
 }

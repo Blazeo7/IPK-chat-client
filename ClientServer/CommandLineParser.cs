@@ -30,19 +30,19 @@ public class CommandLineParser {
   private static void HelpMessage() {
     Console.Error.WriteLine(
       """
-      -t           Required. Transport protocol used for connection
-
-      -s           Required. Server IP or hostname
-
-      -p           (Default: 4567) Server port
-
-      -d           (Default: 250) UDP confirmation timeout (ms)
-
-      -r           (Default: 3) Maximum number of UDP retransmissions
-
-      -v           Verbose (prints logs to stderr)
-
-      -h           Display this help screen.
+            -t           Required. Transport protocol used for connection
+      
+            -s           Required. Server IP or hostname
+      
+            -p           (Default: 4567) Server port
+      
+            -d           (Default: 250) UDP confirmation timeout (ms)
+      
+            -r           (Default: 3) Maximum number of UDP retransmissions
+      
+            -v           Verbose (prints logs to stderr)
+      
+            -h           Display this help screen.
       """);
   }
 
