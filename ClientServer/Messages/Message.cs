@@ -29,8 +29,7 @@ public abstract record Message(ushort Id) {
       case MsgType.Reply:
         byte result = udpMessage[3];
         ushort refMsgId = BitConverter.ToUInt16(udpMessage, 4);
-        var content = Encoding.UTF8.GetString(udpMessage, 6, udpMessage.Length - 6);
-        return new ReplyMessage(result, content, msgId, refMsgId);
+        string[] replyParams = Utils.FromBytes(udpMessage, 6);
 
         if (replyParams.Length != 1)
           return new InvalidMessage(Id: msgId, Content: "Invalid reply message");
