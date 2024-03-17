@@ -8,7 +8,7 @@ namespace ClientServer.Clients;
 public class UdpClient(string hostname, ushort port, int timeout, int retries)
   : BaseClient(hostname, port) {
   private EndPoint _remoteIpEndPoint = null!;
-  private Message? _receivedMessage; // the last received message
+  private readonly Queue<Message> _receivedMessages = new(5); // the 5 last received message
   private int? _msgToBeConfirm; // id of the message that has to be confirmed
   private int? _expectedReplyId; // id of the message that reply has to refer
   private readonly ManualResetEvent _receiveAccessEvent = new(false);
@@ -64,8 +64,14 @@ public class UdpClient(string hostname, ushort port, int timeout, int retries)
           if (refId != _expectedReplyId) {
             Logger.Log($"Expected: {_expectedReplyId}, got: {refId})", recMessage);
 
-            new ErrorMessage(content: "Got an invalid reply message").Print();
-            continue; // Continue receiving without notifying `ReceiveMessage()` thread
+      SendConfirm(recMessage.Id);
+
+      _receivedMessages.Enqueue(recMessage);
+
+      if (_receivedMessages.Count == 1) {
+        _receiveAccessEvent.Set(); // Notify `ReceiveMessage` method
+      }
+    }
           }
 
           // Reply is referring to the correct message
@@ -114,13 +120,12 @@ public class UdpClient(string hostname, ushort port, int timeout, int retries)
   }
 
   public override async Task<Message> ReceiveMessage() {
-    // Wait until other thread release it
+    if (_receivedMessages.Count != 0) return _receivedMessages.Dequeue();
+
+    // Wait if no message in the queue
     await Task.Run(_receiveAccessEvent.WaitOne);
 
-    // reset to force waiting when calling `WaitOne`
-    _receiveAccessEvent.Reset();
-
-    return _receivedMessage!;
+    return _receivedMessages.Dequeue();
   }
 
   public override async Task<bool> SendMessage(Message message) {
