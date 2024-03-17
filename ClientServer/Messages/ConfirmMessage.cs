@@ -3,7 +3,7 @@ using ClientServer.Enums;
 
 namespace ClientServer.Messages;
 
-public class ConfirmMessage(ushort id = 0) : Message(id) {
+public record ConfirmMessage(ushort Id = 0) : Message(Id) {
   public override MsgType MType { get; set; } = MsgType.Confirm;
 
   public override byte[] ToUdpFormat() {

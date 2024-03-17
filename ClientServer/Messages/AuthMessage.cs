@@ -2,12 +2,8 @@
 
 namespace ClientServer.Messages;
 
-public class AuthMessage(string username, string secret, string displayName, ushort id = 0)
-  : Message(id) {
-  public string Username = username;
-  public string Secret = secret;
-  public string DisplayName = displayName;
-
+public record AuthMessage(string Username, string Secret, string DisplayName, ushort Id = 0)
+  : Message(Id) {
   public override MsgType MType { get; set; } = MsgType.Auth;
 
   public override byte[] ToUdpFormat() {

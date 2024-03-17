@@ -2,9 +2,7 @@
 
 namespace ClientServer.Messages;
 
-public class TextMessage(string displayName, string content, ushort id = 0) : Message(id) {
-  public string DisplayName = displayName;
-  public string Content = content;
+public record TextMessage(string DisplayName, string Content, ushort Id = 0) : Message(Id) {
 
   public override MsgType MType { get; set; } = MsgType.Msg;
 

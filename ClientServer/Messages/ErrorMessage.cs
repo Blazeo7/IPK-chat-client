@@ -3,9 +3,8 @@ using ClientServer.Enums;
 
 namespace ClientServer.Messages;
 
-public class ErrorMessage(string content, string? displayName = null, ushort id = 0) : Message(id) {
-  public string? DisplayName = displayName;
-  public string Content = content;
+public record ErrorMessage(string Content, string DisplayName, ushort Id = 0)
+  : Message(Id) {
   public override MsgType MType { get; set; } = MsgType.Err;
 
   public override byte[] ToUdpFormat() {

@@ -2,9 +2,7 @@
 using ClientServer.Enums;
 
 namespace ClientServer.Messages;
-public class JoinMessage(string channelId, string displayName, ushort id = 0) : Message(id) {
-  public string ChannelId = channelId;
-  public string DisplayName = displayName;
+public record JoinMessage(string ChannelId, string DisplayName, ushort Id = 0) : Message(Id) {
   public override MsgType MType { get; set; } = MsgType.Join;
 
   public override byte[] ToUdpFormat() {

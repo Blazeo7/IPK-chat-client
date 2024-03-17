@@ -4,9 +4,7 @@ using ClientServer.Enums;
 
 namespace ClientServer.Messages;
 
-public abstract class Message(ushort id) {
-  public ushort MsgId { get; init; } = id;
-
+public abstract record Message(ushort Id) {
   public abstract MsgType MType { get; set; }
 
   public virtual byte[] ToUdpFormat() {
