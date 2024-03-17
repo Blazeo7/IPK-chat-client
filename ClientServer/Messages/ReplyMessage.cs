@@ -10,6 +10,18 @@ public class ReplyMessage(byte result, string content, ushort id = 0, ushort ref
   public override MsgType MType { get; set; } = MsgType.Reply;
 
   public override void Print() {
-    Console.Error.WriteLine(Result == 1 ? $"Success: {Content}" : $"Failure: {Content}");
+    switch (Result) {
+      case ReplyResult.Ok:
+        Console.Error.WriteLine($"Success: {Content}");
+        break;
+
+      case ReplyResult.Nok:
+        Console.Error.WriteLine($"Failure: {Content}");
+        break;
+
+      default:
+        Utils.PrintInternalError("Invalid reply message result");
+        break;
+    }
   }
 }

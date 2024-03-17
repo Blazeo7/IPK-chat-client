@@ -94,11 +94,11 @@ public abstract class Message(ushort id) {
       string replyResult = replyMatch.Groups[1].Value;
       string msgContent = replyMatch.Groups[2].Value;
 
-      if (replyResult.Equals("OK")) {
-        return new ReplyMessage(1, msgContent);
-      }
-
-      return new ReplyMessage(0, msgContent);
+      return replyResult switch {
+        "OK" => new ReplyMessage(ReplyResult.Ok, msgContent),
+        "NOK" => new ReplyMessage(ReplyResult.Nok, msgContent),
+        _ => new InvalidMessage("Invalid reply result")
+      };
     }
 
     // ERR

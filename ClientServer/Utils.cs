@@ -1,6 +1,7 @@
 ﻿using System.Net;
 using System.Net.Sockets;
 using System.Text;
+using ClientServer.Enums;
 
 namespace ClientServer;
 
@@ -56,12 +57,21 @@ public class Utils {
 
     throw new SocketException();
   }
-  
+
   public static class Counter {
     private static ushort _count;
 
     public static ushort GetNext() {
       return ++_count;
     }
+  }
+
+  public static ReplyResult ReplyResultFromInt(byte a) {
+    return a switch {
+      0 => ReplyResult.Nok,
+      1 => ReplyResult.Ok,
+      _ => ReplyResult.Invalid,
+    };
+  }
   }
 }
