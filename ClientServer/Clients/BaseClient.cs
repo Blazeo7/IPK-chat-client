@@ -11,7 +11,7 @@ namespace ClientServer.Clients;
 /// </remarks>
 /// <param name="host">Remote hostname or IP address</param>
 /// <param name="port">Port where server is listening</param>
-public abstract class BaseClient(string host, ushort port) {
+public abstract class BaseClient(string host, ushort port) : IClient {
   /// <summary>
   /// Remote hostname or IP address
   /// </summary>
