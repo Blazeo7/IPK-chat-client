@@ -10,10 +10,18 @@ namespace ClientServer;
 /// <summary>
 /// Represents a class responsible for handling communication with server.
 /// </summary>
-public class ChatClient(BaseClient client) {
-  protected State CurrentState { get; set; } = State.Start;
-  protected BaseClient Client { get; init; } = client;
-  protected string DisplayName { get; set; } = "default";
+public class ChatClient {
+  private IClient Client { get; }
+  private readonly ChatData _chatInfo = new();
+  private readonly UserCommandHandler _commandHandler;
+  private readonly AutoResetEvent _replyAccessEvent = new(false);
+  private readonly AutoResetEvent _leaveAccessEvent = new(true);
+
+  public ChatClient(IClient client) {
+    Client = client;
+    _commandHandler = new UserCommandHandler(_chatInfo);
+  }
+
 
   /// <summary>
   /// Leads communication from set up phase until the disconnection from server
@@ -243,123 +251,11 @@ public class ChatClient(BaseClient client) {
       }
 
       // Command
-      switch (input) {
-        case var _ when input.StartsWith(UserCommands.Help):
-          PrintHelpMessage();
-          break;
+      Message? message = _commandHandler.HandleCommand(input);
 
-        case var _ when input.StartsWith(UserCommands.Auth):
-          return HandleAuthCommand(input);
-
-        case var _ when input.StartsWith(UserCommands.Join):
-          return HandleJoinCommand(input);
-
-        case var _ when input.StartsWith(UserCommands.Rename):
-          HandleRenameCommand(input);
-          break;
-
-        default: // unknown command
-          Console.Error.WriteLine($"Unknown command `{input}`");
-          PrintHelpMessage();
-          break;
-      }
+      if (message != null) {
+        return message;
     }
   }
-
-
-  /// <summary>
-  /// Handle /auth command.
-  /// </summary>
-  /// <param name="input">The text that contains /auth command.</param>
-  /// <returns>
-  /// <list type="bullet">
-  ///     <item><description><see cref="ErrorMessage"/>: In case of invalid arguments.</description></item>
-  ///     <item><description><see cref="AuthMessage"/>: If the auth command is valid and the <see cref="DisplayName"/> is set based on the
-  /// corresponding argument.</description></item>
-  /// </list>
-  /// </returns>
-  private Message HandleAuthCommand(string input) {
-    // > /auth {username} {secret} {display name}
-    const string authPattern =
-      @"^\/auth\s+([a-zA-Z0-9-]{1,20})\s+([a-zA-Z0-9-]{1,128})\s+([ -~]{1,20})\s*$";
-    var authMatch = Regex.Match(input, authPattern);
-
-    // invalid auth instruction format => print help message
-    if (!authMatch.Success) {
-      return new ErrorMessage("Invalid format of /auth command");
-    }
-
-    var username = authMatch.Groups[1].Value;
-    var password = authMatch.Groups[2].Value;
-    DisplayName = authMatch.Groups[3].Value;
-
-    return new AuthMessage(username, password, DisplayName, Utils.Counter.GetNext());
-  }
-
-  /// <summary>
-  /// Handle /join command.
-  /// </summary>
-  /// <param name="input">The text that contains /join command.</param>
-  /// <returns>
-  /// <list type="bullet">
-  ///     <item><description><see cref="ErrorMessage"/>: In case of invalid arguments.</description></item>
-  ///     <item><description><see cref="JoinMessage"/>: If the join command is valid.</description></item>
-  /// </list>
-  /// </returns>
-  private Message HandleJoinCommand(string input) {
-    // > /join {channel id}
-    const string joinPattern = @"^\/join\s+([a-zA-Z0-9-]{1,20})\s*$";
-    var joinMatch = Regex.Match(input, joinPattern);
-
-    if (!joinMatch.Success) {
-      return new ErrorMessage(content: "Invalid /join command syntax");
-    }
-
-    var channelId = joinMatch.Groups[1].Value;
-    return new JoinMessage(channelId, DisplayName, Utils.Counter.GetNext());
-  }
-
-  /// <summary>
-  /// Check validity of /rename command and in case of success changes user <see cref="DisplayName"/>.
-  /// </summary>
-  /// <param name="input">The text that contains /rename command.</param>
-  private void HandleRenameCommand(string input) {
-    // > /rename {display name}
-    const string renamePattern = @"^\/rename\s+([!-~]{1,20})\s*$";
-    var renameMatch = Regex.Match(input, renamePattern);
-
-    if (!renameMatch.Success) {
-      new ErrorMessage("Invalid syntax for /rename command").Print();
-      PrintHelpMessage();
-      return;
-    }
-
-    switch (CurrentState) {
-      case State.Start:
-      case State.Auth:
-        new ErrorMessage("You are not logged in, please use /auth command").Print();
-        break;
-
-      default:
-        DisplayName = renameMatch.Groups[1].Value;
-        Logger.Log($"Name changed to `{DisplayName}`");
-        break;
-    }
-  }
-
-  /// <summary>
-  /// Prints help message that shows the valid chat commands.
-  /// </summary>
-  private static void PrintHelpMessage() {
-    Console.Error.WriteLine(
-      """
-      Command    Parameters                        Using
-      /auth      {Username} {Secret} {DisplayName} Sends AUTH message with the data provided from
-                                                   the command to the server, locally sets the DisplayName
-      /join      {ChannelID}                       Sends JOIN message with channel name from
-                                                   the command to the server
-      /rename    {DisplayName}                     Locally changes the display name of the user
-      /help                                        Prints this help usage
-      """);
   }
 }
