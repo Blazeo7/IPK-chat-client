@@ -13,12 +13,13 @@ namespace ClientServer {
       };
 
       Logger.Init(options.Verbose);
+    Logger.Log("Starting program");
 
       ChatClient chat = new(client);
       try {
         await chat.Communicate();
       } catch (Exception e) {
-        Logger.Log(e.Message);
+      Logger.Log($"Exception: {e.Message}");
         Environment.Exit(1);
       }
     }

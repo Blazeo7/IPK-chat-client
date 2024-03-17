@@ -33,7 +33,7 @@ public class UdpClient(string hostname, ushort port, int timeout, int retries)
     _receiveAccessEvent.Dispose();
     _confirmAccessEvent.Dispose();
     ClientSocket.Close();
-    Logger.Log("Connection closed");
+    Logger.Log("Client's connection closed");
   }
 
   private async Task ContinuousReceiving() {
@@ -51,7 +51,7 @@ public class UdpClient(string hostname, ushort port, int timeout, int retries)
       // Convert the received message in bytes to `Message`
       Message recMessage = Message.FromUdpFormat(recBuffer);
 
-      Logger.Log("Received", recMessage);
+      Logger.Log("Client received", recMessage);
 
       switch (recMessage.MType) {
         case MsgType.Confirm:
@@ -104,6 +104,7 @@ public class UdpClient(string hostname, ushort port, int timeout, int retries)
   private void SendConfirm(ushort id) {
     Logger.Log($"Confirming message {id}");
     var confirmation = new ConfirmMessage(id);
+    Logger.Log("Client sent", confirmation);
     ClientSocket.SendToAsync(confirmation.ToUdpFormat(), _remoteIpEndPoint);
   }
 
@@ -119,6 +120,7 @@ public class UdpClient(string hostname, ushort port, int timeout, int retries)
 
   public override async Task<bool> SendMessage(Message message) {
     byte[] data = message.ToUdpFormat();
+    Logger.Log("Client sent", message);
 
     if (message.MType is MsgType.Auth or MsgType.Join) {
       Logger.Log($"Expecting reply id: {message.MsgId}");
@@ -141,7 +143,7 @@ public class UdpClient(string hostname, ushort port, int timeout, int retries)
         return true; // Message was successfully received by server
       }
 
-      Logger.Log($"Timeout", message);
+      Logger.Log("Confirmation timeout", message);
     }
 
     return false;

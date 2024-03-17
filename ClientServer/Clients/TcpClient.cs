@@ -23,7 +23,7 @@ public class TcpClient(string hostname, ushort port) : BaseClient(hostname, port
   public override void EndConnection() {
     ClientSocket.Shutdown(SocketShutdown.Both);
     ClientSocket.Close();
-    Console.Error.WriteLine("Socket closed");
+    Logger.Log("Client socket closed");
   }
 
 
@@ -44,6 +44,7 @@ public class TcpClient(string hostname, ushort port) : BaseClient(hostname, port
   }
 
   public override async Task<bool> SendMessage(Message message) {
+    Logger.Log("Client sent", message);
     string tcpMessage = message.ToTcpFormat();
     byte[] data = Encoding.Default.GetBytes(tcpMessage);
     await ClientSocket.SendAsync(data);
