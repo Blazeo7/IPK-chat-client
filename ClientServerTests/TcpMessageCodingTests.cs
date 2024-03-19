@@ -17,8 +17,14 @@ public class TcpMessageCodingTests {
     // @formatter:on
   }
 
-  public static IEnumerable<object[]> FromTcp_TestData_() {
+  public static IEnumerable<object[]> FromTcp_TestData() {
     yield return [new InvalidMessage("INVALID MESSAGE"), "REPLY XXX IS Ok\r\n"];
+    yield return [new ReplyMessage(ReplyResult.Nok,  "Nok"), "rePly nOk Is Nok\r\n"];
+    yield return [new ErrorMessage(DisplayName: "Display_name", Content: "test message"), "ErR fROm Display_name iS test message\r\n"];
+    yield return [new TextMessage(DisplayName: "Display_name", Content: "test message"),"MsG FroM Display_name Is test message\r\n"];
+    yield return [new ByeMessage(), "Bye\r\n"];
+    yield return [new JoinMessage("channel", "Display_name"), "jOIn channel As Display_name\r\n"];
+    yield return [new AuthMessage("test", "secret", "Display_name"), "AuTh test aS Display_name UsiNG secret\r\n"];
   }
 
 
@@ -34,7 +40,7 @@ public class TcpMessageCodingTests {
 
   [Theory]
   [MemberData(nameof(CommonTcpTestData))]
-  [MemberData(nameof(FromTcp_TestData_))]
+  [MemberData(nameof(FromTcp_TestData))]
   public void FromTcpFormat_ShouldReturnCorrectMessageType(Message expectedMessage,
     string tcpMessage) {
     // Act
