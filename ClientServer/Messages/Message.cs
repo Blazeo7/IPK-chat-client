@@ -77,7 +77,7 @@ public abstract record Message(ushort Id) {
   public static Message FromTcpFormat(string tcpMessage) {
     // MSG
     var msgMatch = Regex.Match(tcpMessage, @"^MSG FROM ([!-~]+) IS ([ -~]+)\r\n$",
-      RegexOptions.Multiline);
+      RegexOptions.IgnoreCase);
     if (msgMatch.Success) {
       string displayName = msgMatch.Groups[1].Value;
       string msgContent = msgMatch.Groups[2].Value;
@@ -86,10 +86,10 @@ public abstract record Message(ushort Id) {
 
     // REPLY
     var replyMatch =
-      Regex.Match(tcpMessage, @"^REPLY (OK|NOK) IS ([ -~]+)\r\n$", RegexOptions.Multiline);
+      Regex.Match(tcpMessage, @"^REPLY (OK|NOK) IS ([ -~]+)\r\n$", RegexOptions.IgnoreCase);
 
     if (replyMatch.Success) {
-      string replyResult = replyMatch.Groups[1].Value;
+      string replyResult = replyMatch.Groups[1].Value.ToUpper();
       string msgContent = replyMatch.Groups[2].Value;
 
       return replyResult switch {
@@ -101,7 +101,7 @@ public abstract record Message(ushort Id) {
 
     // ERR
     var errMatch = Regex.Match(tcpMessage, @"^ERR FROM ([!-~]+) IS ([ -~]+)\r\n$",
-      RegexOptions.Multiline);
+      RegexOptions.IgnoreCase);
     if (errMatch.Success) {
       string displayName = errMatch.Groups[1].Value;
       string msgContent = errMatch.Groups[2].Value;
@@ -111,7 +111,7 @@ public abstract record Message(ushort Id) {
     // AUTH
     var authMatch = Regex.Match(tcpMessage,
       @"^AUTH ([a-zA-Z0-9-]{1,20}) AS ([!-~]{1,20}) USING ([a-zA-Z0-9-]{1,128})\r\n$",
-      RegexOptions.Multiline);
+      RegexOptions.IgnoreCase);
     if (authMatch.Success) {
       string username = authMatch.Groups[1].Value;
       string displayName = authMatch.Groups[2].Value;
@@ -121,7 +121,7 @@ public abstract record Message(ushort Id) {
 
     // JOIN
     var joinMatch = Regex.Match(tcpMessage, @"^JOIN ([a-zA-Z0-9-]{1,20}) AS ([!-~]{1,20})\r\n$",
-      RegexOptions.Multiline);
+      RegexOptions.IgnoreCase);
     if (joinMatch.Success) {
       string channelId = joinMatch.Groups[1].Value;
       string displayName = joinMatch.Groups[2].Value;
@@ -129,7 +129,7 @@ public abstract record Message(ushort Id) {
     }
 
     // BYE
-    var byeMatch = Regex.Match(tcpMessage, @"^BYE\r\n$", RegexOptions.Multiline);
+    var byeMatch = Regex.Match(tcpMessage, @"^BYE\r\n$", RegexOptions.IgnoreCase);
     if (byeMatch.Success) {
       return new ByeMessage();
     }
