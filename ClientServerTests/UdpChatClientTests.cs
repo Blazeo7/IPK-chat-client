@@ -24,7 +24,7 @@ public class UdpChatClientTests {
     await _chatSimulator.Simulate(
       () => _chatSimulator.ReceiveMessage("/auth USER SECRET TEST_NAME"), // AUTH
       () => _chatSimulator.SendMessage(new ConfirmMessage(Id: 1)),
-      () => _chatSimulator.SendMessage(new ByeMessage()),
+      () => _chatSimulator.SendMessage(new ByeMessage(Id: 1)),
       () => _chatSimulator.ReceiveMessage("") // CONFIRM (Bye)
     );
 
@@ -37,7 +37,7 @@ public class UdpChatClientTests {
     await _chatSimulator.Simulate(
       () => _chatSimulator.ReceiveMessage("/auth USER SECRET TEST_NAME"), // AUTH:1
       () => _chatSimulator.SendMessage(new ConfirmMessage(Id: 1)),
-      () => _chatSimulator.SendMessage(new ErrorMessage(DisplayName: "SERVER", Content: "ERROR")),
+      () => _chatSimulator.SendMessage(new ErrorMessage(DisplayName: "SERVER", Content: "ERROR", Id: 1)),
       () => _chatSimulator.ReceiveMessage(""), // CONFIRM (Error)
       () => _chatSimulator.ReceiveMessage(""), // BYE:2
       () => _chatSimulator.SendMessage(new ConfirmMessage(Id: 2)),
@@ -53,7 +53,7 @@ public class UdpChatClientTests {
     await _chatSimulator.Simulate(
       () => _chatSimulator.ReceiveMessage("/auth USER SECRET TEST_NAME"), // AUTH:1
       () => _chatSimulator.SendMessage(new ConfirmMessage(Id: 1)),
-      () => _chatSimulator.SendMessage(new InvalidMessage("INVALID MESSAGE")),
+      () => _chatSimulator.SendMessage(new InvalidMessage("INVALID MESSAGE", Id: 1)),
       () => _chatSimulator.ReceiveMessage(""), // CONFIRM (Invalid)
       () => _chatSimulator.ReceiveMessage(""), // ERR:2
       () => _chatSimulator.SendMessage(new ConfirmMessage(Id: 2)),
@@ -74,12 +74,12 @@ public class UdpChatClientTests {
       () => _chatSimulator.ReceiveMessage("/auth USER-1 SECRET TEST_NAME"), // AUTH:1
       () => _chatSimulator.SendMessage(new ConfirmMessage(Id: 1)),
       () => _chatSimulator.SendMessage(new ReplyMessage(ReplyResult.Nok, Content: "NOK",
-        RefMsgId: 1)),
+        RefMsgId: 1, Id: 1)),
       () => _chatSimulator.ReceiveMessage(""), // CONFIRM (Reply)
       () => _chatSimulator.ReceiveMessage("/auth USER-2 SECRET TEST_NAME"), // AUTH:2
       () => _chatSimulator.SendMessage(new ConfirmMessage(Id: 2)),
       () => _chatSimulator.SendMessage(new ReplyMessage(ReplyResult.Ok, Content: "OK",
-        RefMsgId: 2)),
+        RefMsgId: 2, Id: 2)),
       () => _chatSimulator.ReceiveMessage(""), // CONFIRM (Reply)
       () => _chatSimulator.ReceiveMessage(null), // BYE:3
       () => _chatSimulator.SendMessage(new ConfirmMessage(Id: 3)));
@@ -114,7 +114,7 @@ public class UdpChatClientTests {
       () => _chatSimulator.ReceiveMessage("/auth USER SECRET TEST_NAME"), // AUTH:1
       () => _chatSimulator.SendMessage(new ConfirmMessage(Id: 1)),
       () => _chatSimulator.SendMessage(new ReplyMessage(ReplyResult.Ok, Content: "OK",
-        RefMsgId: 1)),
+        RefMsgId: 1, Id: 1)),
       () => _chatSimulator.ReceiveMessage(""), // CONFIRM (Reply)
       () => _chatSimulator.ReceiveMessage(null), // BYE:2
       () => _chatSimulator.SendMessage(new ConfirmMessage(Id: 2)));
@@ -130,9 +130,9 @@ public class UdpChatClientTests {
       () => _chatSimulator.ReceiveMessage("/auth USER SECRET TEST_NAME"), // AUTH:1
       () => _chatSimulator.SendMessage(new ConfirmMessage(Id: 1)),
       () => _chatSimulator.SendMessage(new ReplyMessage(ReplyResult.Ok, Content: "OK",
-        RefMsgId: 1)),
+        RefMsgId: 1, Id: 1)),
       () => _chatSimulator.ReceiveMessage(""), // CONFIRM (Reply)
-      () => _chatSimulator.SendMessage(new ErrorMessage(DisplayName: "SERVER", Content: "ERROR")),
+      () => _chatSimulator.SendMessage(new ErrorMessage(DisplayName: "SERVER", Content: "ERROR", Id: 2)),
       () => _chatSimulator.ReceiveMessage(""), // CONFIRM (Err)
       () => _chatSimulator.ReceiveMessage(""), // BYE:2
       () => _chatSimulator.SendMessage(new ConfirmMessage(Id: 2)));
@@ -150,9 +150,9 @@ public class UdpChatClientTests {
     await _chatSimulator.Simulate(
       () => _chatSimulator.ReceiveMessage("/auth USER SECRET TEST_NAME"), // AUTH
       () => _chatSimulator.SendMessage(new ConfirmMessage(Id: 1)),
-      () => _chatSimulator.SendMessage(new ReplyMessage(ReplyResult.Ok, "OK", RefMsgId: 1)),
+      () => _chatSimulator.SendMessage(new ReplyMessage(ReplyResult.Ok, "OK", RefMsgId: 1, Id: 1)),
       () => _chatSimulator.ReceiveMessage(""), // CONFIRM (Reply)
-      () => _chatSimulator.SendMessage(new InvalidMessage(Content: "INVALID MESSAGE")),
+      () => _chatSimulator.SendMessage(new InvalidMessage(Content: "INVALID MESSAGE", Id: 2)),
       () => _chatSimulator.ReceiveMessage(""), // CONFIRM (Invalid)
       () => _chatSimulator.ReceiveMessage(""), // ERR:2
       () => _chatSimulator.SendMessage(new ConfirmMessage(Id: 2)),
@@ -173,11 +173,11 @@ public class UdpChatClientTests {
     await _chatSimulator.Simulate(
       () => _chatSimulator.ReceiveMessage("/auth USER SECRET TEST_NAME"), // AUTH:1
       () => _chatSimulator.SendMessage(new ConfirmMessage(Id: 1)),
-      () => _chatSimulator.SendMessage(new ReplyMessage(ReplyResult.Ok, "OK", RefMsgId: 1)),
+      () => _chatSimulator.SendMessage(new ReplyMessage(ReplyResult.Ok, "OK", RefMsgId: 1, Id: 1)),
       () => _chatSimulator.ReceiveMessage(""), // CONFIRM (Reply)
       () => _chatSimulator.ReceiveMessage("TEST MESSAGE 1"), // MSG:2
       () => _chatSimulator.SendMessage(new ConfirmMessage(Id: 2)),
-      () => _chatSimulator.SendMessage(new TextMessage("SERVER", "MESSAGE")),
+      () => _chatSimulator.SendMessage(new TextMessage("SERVER", "MESSAGE", Id: 2)),
       () => _chatSimulator.ReceiveMessage(""), // CONFIRM (Msg)
       () => _chatSimulator.ReceiveMessage("TEST MESSAGE 2"), // MSG:3
       () => _chatSimulator.SendMessage(new ConfirmMessage(Id: 3)),
@@ -197,11 +197,11 @@ public class UdpChatClientTests {
     await _chatSimulator.Simulate(
       () => _chatSimulator.ReceiveMessage("/auth USER SECRET TEST_NAME"), // AUTH:1
       () => _chatSimulator.SendMessage(new ConfirmMessage(Id: 1)),
-      () => _chatSimulator.SendMessage(new ReplyMessage(ReplyResult.Ok, "OK", RefMsgId: 1)),
+      () => _chatSimulator.SendMessage(new ReplyMessage(ReplyResult.Ok, "OK", RefMsgId: 1, Id: 1)),
       () => _chatSimulator.ReceiveMessage(""), // CONFIRM (Reply)
       () => _chatSimulator.ReceiveMessage("/join TEST-CHANNEL"), // JOIN:2
       () => _chatSimulator.SendMessage(new ConfirmMessage(Id: 2)),
-      () => _chatSimulator.SendMessage(new ReplyMessage(ReplyResult.Ok, "OK", RefMsgId: 2)),
+      () => _chatSimulator.SendMessage(new ReplyMessage(ReplyResult.Ok, "OK", RefMsgId: 2, Id: 2)),
       () => _chatSimulator.ReceiveMessage(""), // CONFIRM (Reply)
       () => _chatSimulator.ReceiveMessage("TEST MESSAGE"), // MSG:3
       () => _chatSimulator.SendMessage(new ConfirmMessage(Id: 3)),
@@ -222,11 +222,11 @@ public class UdpChatClientTests {
     await _chatSimulator.Simulate(
       () => _chatSimulator.ReceiveMessage("/auth USER SECRET TEST_NAME"), // AUTH:1
       () => _chatSimulator.SendMessage(new ConfirmMessage(Id: 1)),
-      () => _chatSimulator.SendMessage(new ReplyMessage(ReplyResult.Ok, "OK", RefMsgId: 1)),
+      () => _chatSimulator.SendMessage(new ReplyMessage(ReplyResult.Ok, "OK", RefMsgId: 1, Id: 1)),
       () => _chatSimulator.ReceiveMessage(""), // CONFIRM (Reply)
       () => _chatSimulator.ReceiveMessage("/join TEST-CHANNEL"), // JOIN:2
       () => _chatSimulator.SendMessage(new ConfirmMessage(Id: 2)),
-      () => _chatSimulator.SendMessage(new ReplyMessage(ReplyResult.Nok, "NOK", RefMsgId: 2)),
+      () => _chatSimulator.SendMessage(new ReplyMessage(ReplyResult.Nok, "NOK", RefMsgId: 2, Id: 2)),
       () => _chatSimulator.ReceiveMessage(""), // CONFIRM (Reply)
       () => _chatSimulator.ReceiveMessage("TEST MESSAGE"), // MSG:3
       () => _chatSimulator.SendMessage(new ConfirmMessage(Id: 3)),
@@ -247,11 +247,11 @@ public class UdpChatClientTests {
     await _chatSimulator.Simulate(
       () => _chatSimulator.ReceiveMessage("/auth USER SECRET TEST_NAME"), // AUTH:1
       () => _chatSimulator.SendMessage(new ConfirmMessage(Id: 1)),
-      () => _chatSimulator.SendMessage(new ReplyMessage(ReplyResult.Ok, "OK", RefMsgId: 1)),
+      () => _chatSimulator.SendMessage(new ReplyMessage(ReplyResult.Ok, "OK", RefMsgId: 1, Id: 1)),
       () => _chatSimulator.ReceiveMessage(""), // CONFIRM (Reply)
       () => _chatSimulator.ReceiveMessage("TEST MESSAGE"), // MSG:2
       () => _chatSimulator.SendMessage(new ConfirmMessage(Id: 2)),
-      () => _chatSimulator.SendMessage(new ReplyMessage(ReplyResult.Nok, "NOK")),
+      () => _chatSimulator.SendMessage(new ReplyMessage(ReplyResult.Nok, "NOK", Id: 2)),
       () => _chatSimulator.ReceiveMessage(""), // CONFIRM (Reply)
       () => _chatSimulator.ReceiveMessage(""), // ERR:3
       () => _chatSimulator.SendMessage(new ConfirmMessage(Id: 3)),
@@ -273,7 +273,7 @@ public class UdpChatClientTests {
       () => _chatSimulator.ReceiveMessage("/auth USER SECRET TEST_NAME"), // AUTH:1
       () => _chatSimulator.SendMessage(new ConfirmMessage(Id: 1)),
       () => _chatSimulator.SendMessage(new ReplyMessage(ReplyResult.Invalid, Content: "OK",
-        RefMsgId: 1)),
+        RefMsgId: 1, Id: 1)),
       () => _chatSimulator.ReceiveMessage(""), // CONFIRM (Reply)
       () => _chatSimulator.ReceiveMessage(""), // ERR:2
       () => _chatSimulator.SendMessage(new ConfirmMessage(Id: 2)),
@@ -322,7 +322,7 @@ public class UdpChatClientTests {
         "THIS WILL BE SENT WHEN LOGGED IN SUCCESSFULLY"), // AUTH:1
       () => _chatSimulator.SendMessage(new ConfirmMessage(Id: 1)),
       () => _chatSimulator.SendMessage(new ReplyMessage(ReplyResult.Ok, Content: "OK",
-        RefMsgId: 1)),
+        RefMsgId: 1, Id: 1)),
       () => _chatSimulator.ReceiveMessage(""), // CONFIRM:2
       () => _chatSimulator.ReceiveMessage(""), // MSG:2
       () => _chatSimulator.SendMessage(new ConfirmMessage(Id: 2)),
@@ -343,12 +343,12 @@ public class UdpChatClientTests {
     await _chatSimulator.Simulate(
       () => _chatSimulator.ReceiveMessage("/auth USER SECRET TEST_NAME"), // AUTH:1
       () => _chatSimulator.SendMessage(new ReplyMessage(ReplyResult.Ok, Content: "OK",
-        RefMsgId: 1)),
+        RefMsgId: 1, Id: 1)),
       () => _chatSimulator.SendMessage(new ConfirmMessage(Id: 1)),
       () => _chatSimulator.ReceiveMessage(""), // CONFIRM (Reply)
-      () => _chatSimulator.SendMessage(new TextMessage("SERVER", "TEST MESSAGE")),
+      () => _chatSimulator.SendMessage(new TextMessage("SERVER", "TEST MESSAGE", Id: 2)),
       () => _chatSimulator.ReceiveMessage(""), // CONFIRM (Msg)
-      () => _chatSimulator.SendMessage(new ByeMessage()),
+      () => _chatSimulator.SendMessage(new ByeMessage(Id: 3)),
       () => _chatSimulator.ReceiveMessage("")); // CONFIRM (Bye)
 
     Assert.Equal(
@@ -365,7 +365,7 @@ public class UdpChatClientTests {
       () => _chatSimulator.ReceiveMessage("/auth USER SECRET TEST_NAME"), // AUTH:1
       () => _chatSimulator.SendMessage(new ConfirmMessage(Id: 1)),
       () => _chatSimulator.SendMessage(
-        new ReplyMessage(ReplyResult.Ok, Content: "OK", RefMsgId: 99)),
+        new ReplyMessage(ReplyResult.Ok, Content: "OK", RefMsgId: 99, Id: 1)),
       () => _chatSimulator.ReceiveMessage(""), // CONFIRM (Reply)
       () => _chatSimulator.ReceiveMessage(""), // ERR:2
       () => _chatSimulator.SendMessage(new ConfirmMessage(Id: 2)),
@@ -386,8 +386,8 @@ public class UdpChatClientTests {
     await _chatSimulator.Simulate(
       () => _chatSimulator.ReceiveMessage("/auth USER SECRET TEST_NAME"), // AUTH:1
       () => _chatSimulator.SendMessage(new ReplyMessage(ReplyResult.Ok, Content: "OK",
-        RefMsgId: 1)),
-      () => _chatSimulator.SendMessage(new TextMessage(Content: "MSG", DisplayName: "SERVER")),
+        RefMsgId: 1, Id: 1)),
+      () => _chatSimulator.SendMessage(new TextMessage(Content: "MSG", DisplayName: "SERVER", Id: 2)),
       () => _chatSimulator.SendMessage(new ConfirmMessage(Id: 1)),
       () => _chatSimulator.ReceiveMessage(""), // CONFIRM (Reply)
       () => _chatSimulator.ReceiveMessage(""), // CONFIRM (Msg)
@@ -410,7 +410,7 @@ public class UdpChatClientTests {
       () => _chatSimulator.ReceiveMessage("/auth USER SECRET TEST_NAME"), // AUTH:1
       () => _chatSimulator.SendMessage(new ConfirmMessage(Id: 1)),
       () => _chatSimulator.SendMessage(new ReplyMessage(ReplyResult.Ok, Content: "OK",
-        RefMsgId: 1)),
+        RefMsgId: 1, Id: 1)),
       () => _chatSimulator.ReceiveMessage(""), // CONFIRM (Reply)
       () => _chatSimulator.ReceiveMessage("TEST MESSAGE"), // MSG:2
       () => _chatSimulator.ReceiveMessage(""), // MSG:2
@@ -431,9 +431,9 @@ public class UdpChatClientTests {
       () => _chatSimulator.ReceiveMessage("/auth USER SECRET TEST_NAME"), // AUTH:1
       () => _chatSimulator.SendMessage(new ConfirmMessage(Id: 1)),
       () => _chatSimulator.SendMessage(new ReplyMessage(ReplyResult.Ok, Content: "OK",
-        RefMsgId: 1)),
+        RefMsgId: 1, Id:1)),
       () => _chatSimulator.ReceiveMessage(""), // CONFIRM (Reply)
-      () => _chatSimulator.SendMessage(new InvalidMessage("INVALID MESSAGE")),
+      () => _chatSimulator.SendMessage(new InvalidMessage("INVALID MESSAGE", Id:2)),
       () => _chatSimulator.ReceiveMessage(""), // CONFIRM (Invalid)
       () => _chatSimulator.ReceiveMessage(""), // ERR:2
       () => _chatSimulator.ReceiveMessage(""), // ERR:2
