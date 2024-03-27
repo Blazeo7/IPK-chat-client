@@ -27,6 +27,9 @@ public class ChatSimulator(Server server) {
 
     if (timeout.IsCompleted) {
       Logger.Log("Test Timeout");
+      if (!clientTask.IsCompleted) {
+        _process.Kill();
+      }
     }
   }
 
