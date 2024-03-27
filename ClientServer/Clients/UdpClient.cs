@@ -13,6 +13,7 @@ public class UdpClient(string hostname, ushort port, int timeout, int retries)
   private int? _expectedReplyId; // id of the message that reply has to refer
   private readonly AutoResetEvent _receiveAccessEvent = new(false);
   private readonly ManualResetEvent _confirmAccessEvent = new(false);
+  private readonly HashSet<int> _confirmedMessages = [];
 
   public override void SetUpConnection() {
     try {
@@ -71,7 +72,12 @@ public class UdpClient(string hostname, ushort port, int timeout, int retries)
 
       SendConfirm(recMessage.Id);
 
-      _receivedMessages.Enqueue(recMessage);
+
+      if (!_confirmedMessages.Contains(recMessage.Id)) {
+        _receivedMessages.Enqueue(recMessage);
+      }
+
+      _confirmedMessages.Add(recMessage.Id);
 
       if (_receivedMessages.Count == 1) {
         _receiveAccessEvent.Set(); // Notify `ReceiveMessage` method
