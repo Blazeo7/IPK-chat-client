@@ -54,9 +54,8 @@ public class UserCommandHandler(ChatData chatInfo) {
   /// </returns>
   private Message? HandleAuthCommand(string input) {
     // > /auth {username} {secret} {display name}
-    const string authPattern =
-      @"^\/auth\s+([a-zA-Z0-9-]{1,20})\s+([a-zA-Z0-9-]{1,128})\s+([ -~]{1,20})\s*$";
-    var authMatch = Regex.Match(input, authPattern);
+    var authMatch = Regex.Match(input,
+      @"^\/auth\s+([a-zA-Z0-9-]{1,20})\s+([a-zA-Z0-9-]{1,128})\s+([ -~]{1,20})\s*$");
 
     // invalid auth instruction format => print help message
     if (!authMatch.Success) {
@@ -89,8 +88,7 @@ public class UserCommandHandler(ChatData chatInfo) {
   /// </returns>
   private Message? HandleJoinCommand(string input) {
     // > /join {channel id}
-    const string joinPattern = @"^\/join\s+([a-zA-Z0-9-]{1,20})\s*$";
-    var joinMatch = Regex.Match(input, joinPattern);
+    var joinMatch = Regex.Match(input, @"^\/join\s+([a-zA-Z0-9-]{1,20})\s*$");
 
     if (!joinMatch.Success) {
       PrintError("Invalid /join command syntax", showHelp: true);
@@ -112,8 +110,7 @@ public class UserCommandHandler(ChatData chatInfo) {
   /// <param name="input">The text that contains /rename command.</param>
   private void HandleRenameCommand(string input) {
     // > /rename {display name}
-    const string renamePattern = @"^\/rename\s+([!-~]{1,20})\s*$";
-    var renameMatch = Regex.Match(input, renamePattern);
+    var renameMatch = Regex.Match(input, @"^\/rename\s+([!-~]{1,20})\s*$");
 
     if (!renameMatch.Success) {
       PrintError("Invalid syntax for /rename command", showHelp: true);
