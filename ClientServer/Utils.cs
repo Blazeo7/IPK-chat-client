@@ -10,19 +10,19 @@ public class Utils {
   /// Create array of bytes from its parameters
   /// </summary>
   /// <returns>Byte array representing arguments values one after another</returns>
-  public static byte[] AsBytes(dynamic[] primitiveObjects, params string[] parameters) {
+  public static byte[] AsBytes(params dynamic[] parameters) {
     using MemoryStream stream = new();
     using BinaryWriter writer = new(stream);
 
-    foreach (var primitive in primitiveObjects) {
-      writer.Write(primitive);
-    }
-
     // Write values to the stream
     foreach (var param in parameters) {
+      if (param is string) {
       byte[] stringBytes = Encoding.UTF8.GetBytes(param);
       writer.Write(stringBytes);
       writer.Write((byte)0);
+      } else {
+        writer.Write(param);
+    }
     }
 
     // Get the resulting byte array

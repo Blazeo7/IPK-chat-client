@@ -17,7 +17,7 @@ public record ReplyMessage(ReplyResult Result, string Content, ushort Id = 0, us
   }
 
   public override byte[] ToUdpFormat() {
-    return Utils.AsBytes([(byte)MsgType.Reply, Id, (byte)Result, RefMsgId], Content);
+    return Utils.AsBytes((byte)MsgType.Reply, Id, (byte)Result, RefMsgId, Content);
   }
 
   public override void Print() {

@@ -7,7 +7,7 @@ public record TextMessage(string DisplayName, string Content, ushort Id = 0) : M
   public override MsgType MType { get; set; } = MsgType.Msg;
 
   public override byte[] ToUdpFormat() {
-    return Utils.AsBytes([(byte)MsgType.Msg, Id], DisplayName, Content);
+    return Utils.AsBytes((byte)MsgType.Msg, Id, DisplayName, Content);
   }
 
   public override string ToTcpFormat() {

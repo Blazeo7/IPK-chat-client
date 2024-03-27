@@ -14,6 +14,6 @@ public record InvalidMessage(string Content, ushort Id = 0) : Message(Id) {
   }
 
   public override byte[] ToUdpFormat() {
-    return Utils.AsBytes([(byte)MType, Id], Content);
+    return Utils.AsBytes((byte)MType, Id, Content);
   }
 }
