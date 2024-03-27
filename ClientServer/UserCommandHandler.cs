@@ -133,7 +133,7 @@ public class UserCommandHandler(ChatData chatInfo) {
   /// Prints help message that shows the valid chat commands.
   /// </summary>
   private static void PrintHelpMessage() {
-    Console.Error.WriteLine(
+    Console.Out.WriteLine(
       """
       Command    Parameters                        Using
       /auth      {Username} {Secret} {DisplayName} Sends AUTH message with the data provided from

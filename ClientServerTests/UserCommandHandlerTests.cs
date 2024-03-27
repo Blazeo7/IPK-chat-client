@@ -4,10 +4,10 @@ using ClientServer.Messages;
 
 namespace ClientServerTests;
 
-
 public class UserCommandHandlerTests {
   private readonly object _stderrLock = new();
   private readonly StringWriter _errorOutput;
+  private readonly StringWriter _outOutput;
   private readonly ChatData _chatInfo;
   private readonly UserCommandHandler _commandHandler;
 
@@ -17,7 +17,9 @@ public class UserCommandHandlerTests {
     _commandHandler = new UserCommandHandler(_chatInfo);
     // Redirect stderr to a StringWriter
     _errorOutput = new StringWriter();
+    _outOutput = new StringWriter();
     Console.SetError(TextWriter.Synchronized(_errorOutput));
+    Console.SetOut(TextWriter.Synchronized(_outOutput));
   }
 
   [Theory]
@@ -25,7 +27,7 @@ public class UserCommandHandlerTests {
   [InlineData(State.Auth)]
   [InlineData(State.Open)]
   [InlineData(State.Error)]
-  public void HandleCommand_TC1_Help_ReturnsNullAndPrintsToStdErr(State state) {
+  public void HandleCommand_TC1_Help_ReturnsNullAndPrintsToStdOut(State state) {
     // Arrange
     _chatInfo.CurrentState = state;
 
@@ -34,7 +36,8 @@ public class UserCommandHandlerTests {
 
     // Assert
     Assert.Null(result);
-    Assert.NotEmpty(_errorOutput.ToString());
+    Assert.Empty(_errorOutput.ToString());
+    Assert.NotEmpty(_outOutput.ToString());
   }
 
   [Theory]
