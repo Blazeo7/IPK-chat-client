@@ -290,7 +290,7 @@ public class ChatClient {
   /// <returns>The message to be sent to the server.</returns>
   private async Task<Message> GetUserInput() {
     while (true) {
-      string? input = Console.ReadLine()?.Trim();
+      string? input = Console.ReadLine();
 
       // End of stdin
       if (input == null) {
@@ -303,6 +303,12 @@ public class ChatClient {
       // Text message
       if (!input.StartsWith('/')) {
         return new TextMessage(_chatInfo.DisplayName, Content: input, Id: Utils.Counter.GetNext());
+      }
+
+      // Message content too long
+      if (input.Length > 1400) {
+        Utils.PrintInternalError("Maximum message size is 1400 characters");
+        continue;
       }
 
       // Command
