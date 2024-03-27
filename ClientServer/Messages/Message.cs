@@ -76,7 +76,7 @@ public abstract record Message(ushort Id) {
 
   public static Message FromTcpFormat(string tcpMessage) {
     // MSG
-    var msgMatch = Regex.Match(tcpMessage, @"^MSG FROM ([!-~]+) IS ([ -~]+)\r\n$",
+    var msgMatch = Regex.Match(tcpMessage, @"^MSG FROM ([!-~]{1,20}) IS ([ -~]{1,1400})\r\n$",
       RegexOptions.IgnoreCase);
     if (msgMatch.Success) {
       string displayName = msgMatch.Groups[1].Value;
@@ -86,7 +86,7 @@ public abstract record Message(ushort Id) {
 
     // REPLY
     var replyMatch =
-      Regex.Match(tcpMessage, @"^REPLY (OK|NOK) IS ([ -~]+)\r\n$", RegexOptions.IgnoreCase);
+      Regex.Match(tcpMessage, @"^REPLY (OK|NOK) IS ([ -~]{1,1400})\r\n$", RegexOptions.IgnoreCase);
 
     if (replyMatch.Success) {
       string replyResult = replyMatch.Groups[1].Value.ToUpper();
@@ -100,7 +100,7 @@ public abstract record Message(ushort Id) {
     }
 
     // ERR
-    var errMatch = Regex.Match(tcpMessage, @"^ERR FROM ([!-~]+) IS ([ -~]+)\r\n$",
+    var errMatch = Regex.Match(tcpMessage, @"^ERR FROM ([!-~]{1,20}) IS ([ -~]{1,1400})\r\n$",
       RegexOptions.IgnoreCase);
     if (errMatch.Success) {
       string displayName = errMatch.Groups[1].Value;
