@@ -58,21 +58,18 @@ public class ChatClient {
   /// </summary>
   private async Task StartState() {
     var message = await GetUserInput();
-    switch (message.MType) {
-      case MsgType.Auth:
+
+    if (message.MType is MsgType.Auth) {
         bool isSuccess = await Client.SendMessage(message);
+
         if (isSuccess) {
           _chatInfo.CurrentState = State.Auth;
         } else {
-          Logger.Log("Message not confirmed");
+        Logger.Log("Message was not confirmed");
           await LeaveChat();
         }
-
-        break;
-
-      default:
+    } else {
         Utils.PrintInternalError("You need to authenticate using valid /auth command");
-        break;
     }
   }
 
@@ -183,10 +180,10 @@ public class ChatClient {
         await Client.SendMessage(new ByeMessage(Id: Utils.Counter.GetNext()));
       }
 
-      _leaveAccessEvent.Set();
-      _replyAccessEvent.Dispose();
       Client.EndConnection();
+      _replyAccessEvent.Dispose();
       _leaveAccessEvent.Dispose();
+      Logger.Log("Exit");
       Environment.Exit(0);
     }
   }
@@ -219,17 +216,9 @@ public class ChatClient {
           await Task.Run(_replyAccessEvent.WaitOne);
           break;
 
-
-        case MsgType.Auth:
-          Utils.PrintInternalError("You are already logged in");
-          break;
-
-        case MsgType.Err:
-          message.Print();
-          break;
-
         default:
-          throw new UnreachableException();
+          Utils.PrintInternalError("Invalid message read from the input");
+          break;
       }
     }
   }
