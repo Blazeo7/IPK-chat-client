@@ -48,11 +48,6 @@ public class UdpClient(string hostname, ushort port, int timeout, int retries)
       // Update remote address endpoint
       _remoteIpEndPoint = receiveResult.RemoteEndPoint;
 
-      // Ignore trash messages
-      if (receiveResult.ReceivedBytes < 3) {
-        continue;
-      }
-
       Message recMessage = Message.FromUdpFormat(recBuffer);
 
       Logger.Log("Client received", recMessage);

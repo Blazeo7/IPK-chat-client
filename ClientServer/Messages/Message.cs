@@ -19,6 +19,8 @@ public abstract record Message(ushort Id) {
   }
 
   public static Message FromUdpFormat(byte[] udpMessage) {
+    if (udpMessage.Length < 3) return new InvalidMessage("Too short message");
+
     MsgType type = (MsgType)udpMessage[0];
     ushort msgId = Utils.HostToNetworkOrder(BitConverter.ToUInt16(udpMessage, 1));
 
