@@ -78,4 +78,15 @@ public class Utils {
   public static void PrintInternalError(string message) {
     Console.Error.WriteLine($"ERR: {message}");
   }
+
+  public static ushort HostToNetworkOrder(ushort value) {
+    // Check if the system is little-endian
+    bool isLittleEndian = BitConverter.IsLittleEndian;
+
+    if (isLittleEndian) {
+      return (ushort)((value >> 8) | (value << 8));
+    } else {
+      return value;
+    }
+  }
 }

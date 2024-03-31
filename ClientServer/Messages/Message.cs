@@ -20,7 +20,7 @@ public abstract record Message(ushort Id) {
 
   public static Message FromUdpFormat(byte[] udpMessage) {
     MsgType type = (MsgType)udpMessage[0];
-    ushort msgId = BitConverter.ToUInt16(udpMessage, 1);
+    ushort msgId = Utils.HostToNetworkOrder(BitConverter.ToUInt16(udpMessage, 1));
 
     switch (type) {
       case MsgType.Confirm:
@@ -28,7 +28,7 @@ public abstract record Message(ushort Id) {
 
       case MsgType.Reply:
         byte result = udpMessage[3];
-        ushort refMsgId = BitConverter.ToUInt16(udpMessage, 4);
+        ushort refMsgId = Utils.HostToNetworkOrder(BitConverter.ToUInt16(udpMessage, 4));
         string[] replyParams = Utils.FromBytes(udpMessage, 6);
 
         if (replyParams.Length != 1)
