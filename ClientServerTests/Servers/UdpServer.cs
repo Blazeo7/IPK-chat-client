@@ -1,6 +1,7 @@
 ﻿using System.Net;
 using System.Net.Sockets;
 using ClientServer;
+using ClientServer.Enums;
 using ClientServer.Messages;
 using static System.Net.Sockets.SocketFlags;
 
@@ -34,7 +35,6 @@ public class UdpServer(string host, ushort port, int retries, int timeout) : Ser
   public override async Task<Message> ReceiveMessage() {
     byte[] recBuffer = new byte[2048];
 
-    while (true) {
       var receiveResult = await
         ServerSocket.ReceiveFromAsync(recBuffer, None, _clientEndPoint);
 
@@ -46,4 +46,3 @@ public class UdpServer(string host, ushort port, int retries, int timeout) : Ser
       return message;
     }
   }
-}
