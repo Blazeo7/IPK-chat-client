@@ -45,9 +45,6 @@ public class UdpClient(string hostname, ushort port, int timeout, int retries)
       SocketReceiveFromResult receiveResult =
         await ClientSocket.ReceiveFromAsync(recBuffer, SocketFlags.None, _remoteIpEndPoint);
 
-      // Update remote address endpoint
-      _remoteIpEndPoint = receiveResult.RemoteEndPoint;
-
       Message recMessage = Message.FromUdpFormat(recBuffer);
 
       Logger.Log("Client received", recMessage);
@@ -58,6 +55,7 @@ public class UdpClient(string hostname, ushort port, int timeout, int retries)
         continue; // Continue receiving without notifying `ReceiveMessage` method
       }
 
+      // Confirm whatever message was received
       SendConfirm(recMessage.Id);
 
       // Skip messages that had been received
@@ -65,7 +63,10 @@ public class UdpClient(string hostname, ushort port, int timeout, int retries)
 
       // Handle Reply message
       if (recMessage.MType is MsgType.Reply) {
-        if (!CheckReplyMessage(recMessage)) {
+        // Update remote address endpoint after receiving reply message
+        _remoteIpEndPoint = receiveResult.RemoteEndPoint;
+
+        if (!CheckReplyMessage((ReplyMessage)recMessage)) {
           recMessage = new InvalidMessage(Content: "Got an invalid reply message");
         }
       }
@@ -78,21 +79,19 @@ public class UdpClient(string hostname, ushort port, int timeout, int retries)
     }
   }
 
-  /// <summary>
-  /// Check if the <see cref="recMessage"/> refer to the correct message (last sent).
-  /// </summary>
-  private bool CheckReplyMessage(Message recMessage) {
-    if (recMessage is not ReplyMessage message) return false;
-
-    int refId = message.RefMsgId;
+  /// <summary>Check if the <see cref="message"/> refer to the correct message (last sent).</summary>
+  private bool CheckReplyMessage(ReplyMessage message) {
+    ushort refId = message.RefMsgId;
 
     // Incorrect reply message
     if (refId != _expectedReplyId) {
-      Logger.Log($"Expected: {_expectedReplyId}, got: {refId})", message);
+      Logger.Log($"Expected: {_expectedReplyId}, got: {refId}", message);
       return false;
     }
 
+    // No reply is expected from now on
     _expectedReplyId = null;
+
     return true;
   }
 
@@ -114,10 +113,7 @@ public class UdpClient(string hostname, ushort port, int timeout, int retries)
     _confirmAccessEvent.Set();
   }
 
-  /// <summary>
-  /// Sends one confirmation message to the server
-  /// </summary>
-  /// <param name="id"></param>
+  /// <summary>Sends confirmation message with the <see cref="id"/> to the server</summary>
   private void SendConfirm(ushort id) {
     var confirmation = new ConfirmMessage(id);
     Logger.Log("Client sent", confirmation);
@@ -138,6 +134,7 @@ public class UdpClient(string hostname, ushort port, int timeout, int retries)
 
     _msgToBeConfirmed = message.Id;
 
+    // Expect reply when after `Auth` or `Join` is sent
     if (message.MType is MsgType.Auth or MsgType.Join) {
       _expectedReplyId = message.Id;
     }
