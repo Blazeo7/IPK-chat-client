@@ -117,6 +117,7 @@ public class ChatClient {
 
 
       case MsgType.Err:
+        receiveMessage.Print();
         await LeaveChat();
         break;
 
@@ -194,6 +195,11 @@ public class ChatClient {
   private async Task OpenStateSending() {
     while (true) {
       Message message = await GetUserInput();
+
+      if (_chatInfo.CurrentState != State.Open) {
+        Logger.Log("Invalid state to sending message");
+        return;
+      }
 
       switch (message.MType) {
         case MsgType.Msg:
