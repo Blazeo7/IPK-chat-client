@@ -9,7 +9,7 @@ public class UdpClient(string hostname, ushort port, int timeout, int retries)
   : BaseClient(hostname, port) {
   private EndPoint _remoteIpEndPoint = null!;
   private readonly Queue<Message> _receivedMessages = new(5); // the 5 last received message
-  private int? _msgToBeConfirm; // id of the message that has to be confirmed
+  private int? _msgToBeConfirmed; // id of the message that has to be confirmed
   private int? _expectedReplyId; // id of the message that reply has to refer
   private readonly AutoResetEvent _receiveAccessEvent = new(false);
   private readonly ManualResetEvent _confirmAccessEvent = new(false);
@@ -20,12 +20,12 @@ public class UdpClient(string hostname, ushort port, int timeout, int retries)
       ClientSocket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
       ClientSocket.Bind(new IPEndPoint(IPAddress.Any, 0));
 
-      IPAddress ipv4 = Utils.ConvertHostname2IPv4(HostName);
+      IPAddress ipv4 = Utils.ConvertHostname2IPv4(Hostname);
       _remoteIpEndPoint = new IPEndPoint(ipv4, Port);
 
       Task.Run(ContinuousReceiving);
     } catch (SocketException) {
-      Utils.PrintInternalError($"Cannot connect to {HostName}:{Port}");
+      Utils.PrintInternalError($"Cannot connect to {Hostname}:{Port}");
       Environment.Exit(1);
     }
   }
@@ -57,23 +57,24 @@ public class UdpClient(string hostname, ushort port, int timeout, int retries)
 
       Logger.Log("Client received", recMessage);
 
-      switch (recMessage.MType) {
-        case MsgType.Confirm:
+      // Handle Confirmation
+      if (recMessage.MType is MsgType.Confirm) {
           HandleConfirmMessage(recMessage);
           continue; // Continue receiving without notifying `ReceiveMessage` method
-
-        case MsgType.Reply:
-          if (!CheckReplyMessage(recMessage)) {
-            recMessage = new InvalidMessage(Content: "Got an invalid reply message");
-          }
-
-          break;
       }
 
       SendConfirm(recMessage.Id);
 
+      // Skip messages that had been received
+      if (!_confirmedMessages.Add(recMessage.Id)) continue;
 
-      if (!_confirmedMessages.Contains(recMessage.Id)) {
+      // Handle Reply message
+      if (recMessage.MType is MsgType.Reply) {
+          if (!CheckReplyMessage(recMessage)) {
+            recMessage = new InvalidMessage(Content: "Got an invalid reply message");
+          }
+      }
+
         _receivedMessages.Enqueue(recMessage);
       }
 
