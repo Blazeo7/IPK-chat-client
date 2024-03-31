@@ -18,6 +18,9 @@ public class Utils {
         byte[] stringBytes = Encoding.ASCII.GetBytes(param);
       writer.Write(stringBytes);
       writer.Write((byte)0);
+      } else if (param is ushort) {
+        // Indices in network byte order
+        writer.Write(HostToNetworkOrder(param));
       } else {
         writer.Write(param);
     }
