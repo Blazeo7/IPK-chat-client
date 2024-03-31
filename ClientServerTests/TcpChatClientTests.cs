@@ -73,7 +73,33 @@ public class TcpChatClientTests {
   }
 
   [Fact]
-  public async Task TcpChatClient_TC6_OpenState_ByeReceived() {
+  public async Task TcpChatClient_TC6_AuthState_SendBye() {
+    await _chatSimulator.Simulate(
+      () => _chatSimulator.ReceiveMessage("/auth USER-1 SECRET TEST_NAME"), // AUTH
+      () => _chatSimulator.SendMessage(new ReplyMessage(ReplyResult.Nok, Content: "NOK")),
+      () => _chatSimulator.ReceiveMessage(null), // BYE
+      () => _chatSimulator.ReceiveMessage(null)); // nothing received
+
+    Assert.Equal(
+      [MsgType.Auth, MsgType.Reply, MsgType.Bye],
+      _chatSimulator.ExchangedMessages);
+  }
+
+  [Fact]
+  public async Task TcpChatClient_TC7_AuthState_InvalidReplyResult_ErrorSent() {
+    await _chatSimulator.Simulate(
+      () => _chatSimulator.ReceiveMessage("/auth USER SECRET TEST_NAME"), // AUTH
+      () => _chatSimulator.SendMessage(new ReplyMessage(ReplyResult.Invalid, Content: "OK")),
+      () => _chatSimulator.ReceiveMessage(""), // ERR
+      () => _chatSimulator.ReceiveMessage(""), // BYE
+      () => _chatSimulator.ReceiveMessage(null)); // nothing
+
+    Assert.Equal([MsgType.Auth, MsgType.Reply, MsgType.Err, MsgType.Bye],
+      _chatSimulator.ExchangedMessages);
+  }
+
+  [Fact]
+  public async Task TcpChatClient_TC8_OpenState_ByeReceived() {
     await _chatSimulator.Simulate(
       () => _chatSimulator.ReceiveMessage("/auth USER SECRET TEST_NAME"), // AUTH
       () => _chatSimulator.SendMessage(new ReplyMessage(ReplyResult.Ok, Content: "OK")),
@@ -86,7 +112,7 @@ public class TcpChatClientTests {
   }
 
   [Fact]
-  public async Task TcpChatClient_TC7_OpenStateInterruption_SentBye() {
+  public async Task TcpChatClient_TC9_OpenStateInterruption_SentBye() {
     await _chatSimulator.Simulate(
       () => _chatSimulator.ReceiveMessage("/auth USER SECRET TEST_NAME"), // AUTH
       () => _chatSimulator.SendMessage(new ReplyMessage(ReplyResult.Ok, Content: "OK")),
@@ -99,7 +125,7 @@ public class TcpChatClientTests {
   }
 
   [Fact]
-  public async Task TcpChatClient_TC8_OpenState_ErrorReceived() {
+  public async Task TcpChatClient_TC10_OpenState_ErrorReceived() {
     await _chatSimulator.Simulate(
       () => _chatSimulator.ReceiveMessage("/auth USER SECRET TEST_NAME"), // AUTH
       () => _chatSimulator.SendMessage(new ReplyMessage(ReplyResult.Ok, Content: "OK")),
@@ -113,7 +139,7 @@ public class TcpChatClientTests {
   }
 
   [Fact]
-  public async Task TcpChatClient_TC9_OpenState_InvalidMessage() {
+  public async Task TcpChatClient_TC11_OpenState_InvalidMessage() {
     await _chatSimulator.Simulate(
       () => _chatSimulator.ReceiveMessage("/auth USER SECRET TEST_NAME"), // AUTH
       () => _chatSimulator.SendMessage(new ReplyMessage(ReplyResult.Ok, "OK")),
@@ -128,7 +154,7 @@ public class TcpChatClientTests {
 
 
   [Fact]
-  public async Task TcpChatClient_TC10_OpenState_MessageExchange() {
+  public async Task TcpChatClient_TC12_OpenState_MessageExchange() {
     await _chatSimulator.Simulate(
       () => _chatSimulator.ReceiveMessage("/auth USER SECRET TEST_NAME"), // AUTH
       () => _chatSimulator.SendMessage(new ReplyMessage(ReplyResult.Ok, "OK")),
@@ -143,7 +169,7 @@ public class TcpChatClientTests {
   }
 
   [Fact]
-  public async Task TcpChatClient_TC11_OpenState_JoinSucceed() {
+  public async Task TcpChatClient_TC13_OpenState_JoinSucceed() {
     await _chatSimulator.Simulate(
       () => _chatSimulator.ReceiveMessage("/auth USER SECRET TEST_NAME"), // AUTH
       () => _chatSimulator.SendMessage(new ReplyMessage(ReplyResult.Ok, "OK")),
@@ -159,7 +185,7 @@ public class TcpChatClientTests {
   }
 
   [Fact]
-  public async Task TcpChatClient_TC12_OpenState_JoinFailed() {
+  public async Task TcpChatClient_TC14_OpenState_JoinFailed() {
     await _chatSimulator.Simulate(
       () => _chatSimulator.ReceiveMessage("/auth USER SECRET TEST_NAME"), // AUTH
       () => _chatSimulator.SendMessage(new ReplyMessage(ReplyResult.Ok, "OK")),
@@ -175,7 +201,7 @@ public class TcpChatClientTests {
   }
 
   [Fact]
-  public async Task TcpChatClient_TC13_OpenState_InvalidReply() {
+  public async Task TcpChatClient_TC15_OpenState_InvalidReply() {
     await _chatSimulator.Simulate(
       () => _chatSimulator.ReceiveMessage("/auth USER SECRET TEST_NAME"), // AUTH
       () => _chatSimulator.SendMessage(new ReplyMessage(ReplyResult.Ok, "OK")),
@@ -189,17 +215,18 @@ public class TcpChatClientTests {
       [MsgType.Auth, MsgType.Reply, MsgType.Msg, MsgType.Reply, MsgType.Err, MsgType.Bye],
       _chatSimulator.ExchangedMessages);
   }
-
+  
   [Fact]
-  public async Task TcpChatClient_TC14_AuthState_InvalidReplyResult_ErrorSent() {
+  public async Task TcpChatClient_TC16_ErrorState_NoMessageSent() {
     await _chatSimulator.Simulate(
       () => _chatSimulator.ReceiveMessage("/auth USER SECRET TEST_NAME"), // AUTH
-      () => _chatSimulator.SendMessage(new ReplyMessage(ReplyResult.Invalid, Content: "OK")),
+      () => _chatSimulator.SendMessage(new ReplyMessage(ReplyResult.Ok, "OK")),
+      () => _chatSimulator.SendMessage(new InvalidMessage(Content: "INVALID MESSAGE")),
       () => _chatSimulator.ReceiveMessage(""), // ERR
-      () => _chatSimulator.ReceiveMessage(""), // BYE
-      () => _chatSimulator.ReceiveMessage(null)); // nothing
+      () => _chatSimulator.ReceiveMessage("DO NOT SEND THIS MESSAGE"), // BYE
+      () => _chatSimulator.ReceiveMessage(null)); // nothing received
 
-    Assert.Equal([MsgType.Auth, MsgType.Reply, MsgType.Err, MsgType.Bye],
+    Assert.Equal([MsgType.Auth, MsgType.Reply, MsgType.Invalid, MsgType.Err, MsgType.Bye],
       _chatSimulator.ExchangedMessages);
   }
 }

@@ -15,7 +15,7 @@ public abstract class BaseClient(string host, ushort port) : IClient {
   /// <summary>
   /// Remote hostname or IP address
   /// </summary>
-  protected string HostName { get; set; } = host;
+  protected string Hostname { get; set; } = host;
 
   /// <summary>
   /// Port where server is listening
