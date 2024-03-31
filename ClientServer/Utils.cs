@@ -6,9 +6,7 @@ using ClientServer.Enums;
 namespace ClientServer;
 
 public class Utils {
-  /// <summary>
-  /// Create array of bytes from its parameters
-  /// </summary>
+  /// <summary>Create array of bytes from its parameters</summary>
   /// <returns>Byte array representing arguments values one after another</returns>
   public static byte[] AsBytes(params dynamic[] parameters) {
     using MemoryStream stream = new();
@@ -17,7 +15,7 @@ public class Utils {
     // Write values to the stream
     foreach (var param in parameters) {
       if (param is string) {
-      byte[] stringBytes = Encoding.UTF8.GetBytes(param);
+        byte[] stringBytes = Encoding.ASCII.GetBytes(param);
       writer.Write(stringBytes);
       writer.Write((byte)0);
       } else {
@@ -30,20 +28,16 @@ public class Utils {
   }
 
 
-  /// <summary>
-  /// Get array of strings from bytes.
-  /// </summary>
+  /// <summary>Get array of strings from bytes.</summary>
   /// <param name="data">byte array that contains strings (separated by \0)</param>
   /// <param name="index">Start of the first string</param>
   /// <returns>Returns all strings from byte array based on \0 separator in <see cref="data"/></returns>
   public static string[] FromBytes(byte[] data, int index = 0) {
-    string str = Encoding.UTF8.GetString(data, index, data.Length - index);
+    string str = Encoding.ASCII.GetString(data, index, data.Length - index);
     return str.Split("\0", StringSplitOptions.RemoveEmptyEntries);
   }
 
-  /// <summary>
-  /// Convert <see cref="hostname"/> to IPv4 address
-  /// </summary>
+  /// <summary>Convert <see cref="hostname"/> to IPv4 address</summary>
   /// <param name="hostname"></param>
   /// <returns>IP address corresponding to the <see cref="hostname"/></returns>
   /// <exception cref="SocketException"></exception>

@@ -15,7 +15,6 @@ public class UserCommandHandlerTests {
   public UserCommandHandlerTests() {
     _chatInfo = new ChatData();
     _commandHandler = new UserCommandHandler(_chatInfo);
-    // Redirect stderr to a StringWriter
     _errorOutput = new StringWriter();
     _outOutput = new StringWriter();
     Console.SetError(TextWriter.Synchronized(_errorOutput));

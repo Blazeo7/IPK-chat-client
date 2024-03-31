@@ -13,10 +13,10 @@ public class TcpClient(string hostname, ushort port) : BaseClient(hostname, port
   public override void SetUpConnection() {
     try {
       ClientSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-      IPAddress ipv4 = Utils.ConvertHostname2IPv4(HostName);
+      IPAddress ipv4 = Utils.ConvertHostname2IPv4(Hostname);
       ClientSocket.Connect(ipv4, Port);
     } catch (SocketException) {
-      Utils.PrintInternalError($"Cannot connect to {HostName}:{Port}");
+      Utils.PrintInternalError($"Cannot connect to {Hostname}:{Port}");
       Environment.Exit(1);
     }
   }
@@ -37,9 +37,7 @@ public class TcpClient(string hostname, ushort port) : BaseClient(hostname, port
       return Message.FromTcpFormat(_receivedMessages.Dequeue());
     }
 
-    string receivedMessage = Encoding.UTF8.GetString(buffer).TrimEnd('\0');
-
-    Logger.Log('`' + receivedMessage + '`');
+    string receivedMessage = Encoding.ASCII.GetString(buffer).TrimEnd('\0');
 
     ProcessReceivedStream(receivedMessage);
 
@@ -82,7 +80,7 @@ public class TcpClient(string hostname, ushort port) : BaseClient(hostname, port
   public override async Task<bool> SendMessage(Message message) {
     Logger.Log("Client sent", message);
     string tcpMessage = message.ToTcpFormat();
-    byte[] data = Encoding.Default.GetBytes(tcpMessage);
+    byte[] data = Encoding.ASCII.GetBytes(tcpMessage);
     await ClientSocket.SendAsync(data);
     return true;
   }

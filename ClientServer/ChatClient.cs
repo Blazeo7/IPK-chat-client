@@ -22,13 +22,11 @@ public class ChatClient {
   }
 
 
-  /// <summary>
-  /// Leads communication from set up phase until the disconnection from server
-  /// </summary>
+  /// <summary>Leads communication from set up phase until the disconnection from server</summary>
   public async Task Communicate() {
     Client.SetUpConnection();
     _chatInfo.Connected = true;
-    // handle interruption signal Ctrl^C
+    // handle interruption signal Ctrl+C
     Console.CancelKeyPress += async (_, e) => {
       // Prevent the default behavior (program termination)
       e.Cancel = true;
@@ -212,6 +210,7 @@ public class ChatClient {
 
         case MsgType.Join:
           bool isJoinSent = await Client.SendMessage(message);
+
           if (!isJoinSent) { // message was not received by the server
             await LeaveChat();
           }

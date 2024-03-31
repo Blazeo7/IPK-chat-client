@@ -59,8 +59,8 @@ public class UdpClient(string hostname, ushort port, int timeout, int retries)
 
       // Handle Confirmation
       if (recMessage.MType is MsgType.Confirm) {
-          HandleConfirmMessage(recMessage);
-          continue; // Continue receiving without notifying `ReceiveMessage` method
+        HandleConfirmMessage(recMessage);
+        continue; // Continue receiving without notifying `ReceiveMessage` method
       }
 
       SendConfirm(recMessage.Id);
@@ -70,15 +70,12 @@ public class UdpClient(string hostname, ushort port, int timeout, int retries)
 
       // Handle Reply message
       if (recMessage.MType is MsgType.Reply) {
-          if (!CheckReplyMessage(recMessage)) {
-            recMessage = new InvalidMessage(Content: "Got an invalid reply message");
-          }
+        if (!CheckReplyMessage(recMessage)) {
+          recMessage = new InvalidMessage(Content: "Got an invalid reply message");
+        }
       }
 
-        _receivedMessages.Enqueue(recMessage);
-      }
-
-      _confirmedMessages.Add(recMessage.Id);
+      _receivedMessages.Enqueue(recMessage);
 
       if (_receivedMessages.Count == 1) {
         _receiveAccessEvent.Set(); // Notify `ReceiveMessage` method
@@ -109,14 +106,14 @@ public class UdpClient(string hostname, ushort port, int timeout, int retries)
   /// successful confirmation otherwise ignore this message.
   /// </summary>
   private void HandleConfirmMessage(Message recMessage) {
-    Logger.Log($"Expected: {_msgToBeConfirm}, got: {recMessage.Id}", recMessage);
+    Logger.Log($"Expected: {_msgToBeConfirmed}, got: {recMessage.Id}", recMessage);
 
     // Ignore invalid confirm message
-    if (_msgToBeConfirm == null || recMessage.Id != _msgToBeConfirm) return;
+    if (_msgToBeConfirmed == null || recMessage.Id != _msgToBeConfirmed) return;
 
     Logger.Log("Confirmed!", recMessage);
 
-    _msgToBeConfirm = null;
+    _msgToBeConfirmed = null;
 
     // Notify `SendMessage` method about successful confirmation
     _confirmAccessEvent.Set();
@@ -142,16 +139,18 @@ public class UdpClient(string hostname, ushort port, int timeout, int retries)
   }
 
   public override async Task<bool> SendMessage(Message message) {
-    byte[] data = message.ToUdpFormat();
     Logger.Log("Client sent", message);
+
+    _msgToBeConfirmed = message.Id;
 
     if (message.MType is MsgType.Auth or MsgType.Join) {
       _expectedReplyId = message.Id;
     }
 
+    byte[] data = message.ToUdpFormat();
+
     for (int i = 0; i < retries + 1; i++) {
       await ClientSocket.SendToAsync(data, _remoteIpEndPoint);
-      _msgToBeConfirm = message.Id;
 
       Task timeoutTask = Task.Delay(millisecondsDelay: timeout);
       Task confirmTask = Task.Run(_confirmAccessEvent.WaitOne);
