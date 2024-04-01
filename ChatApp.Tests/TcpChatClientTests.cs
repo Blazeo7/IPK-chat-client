@@ -1,5 +1,4 @@
-﻿using ChatApp;
-using ChatApp.Enums;
+﻿using ChatApp.Enums;
 using ChatApp.Messages;
 using ChatApp.Tests.Servers;
 
@@ -24,7 +23,7 @@ public class TcpChatClientTests {
       () => _chatSimulator.ReceiveMessage("/auth USER SECRET TEST_NAME"), // AUTH
       () => _chatSimulator.SendMessage(new ByeMessage()),
       () => _chatSimulator.ReceiveMessage(""), // BYE
-      () => _chatSimulator.ReceiveMessage(null)); // nothing received
+      () => _chatSimulator.ReceiveMessage("")); // nothing received
 
     Assert.Equal([MsgType.Auth, MsgType.Bye],
       _chatSimulator.ExchangedMessages);
@@ -36,7 +35,7 @@ public class TcpChatClientTests {
       () => _chatSimulator.ReceiveMessage("/auth USER SECRET TEST_NAME"), // AUTH
       () => _chatSimulator.SendMessage(new ErrorMessage(DisplayName: "SERVER", Content: "ERROR")),
       () => _chatSimulator.ReceiveMessage(""), // BYE
-      () => _chatSimulator.ReceiveMessage(null)); // nothing received
+      () => _chatSimulator.ReceiveMessage("")); // nothing received
 
     Assert.Equal([MsgType.Auth, MsgType.Err, MsgType.Bye],
       _chatSimulator.ExchangedMessages);
@@ -49,7 +48,7 @@ public class TcpChatClientTests {
       () => _chatSimulator.SendMessage(new InvalidMessage("INVALID MESSAGE")),
       () => _chatSimulator.ReceiveMessage(""), // ERR
       () => _chatSimulator.ReceiveMessage(""), // BYE
-      () => _chatSimulator.ReceiveMessage(null)); // nothing received
+      () => _chatSimulator.ReceiveMessage("")); // nothing received
 
     Assert.Equal(
       [MsgType.Auth, MsgType.Invalid, MsgType.Err, MsgType.Bye],
@@ -64,7 +63,7 @@ public class TcpChatClientTests {
       () => _chatSimulator.ReceiveMessage("/auth USER-2 SECRET TEST_NAME"), // AUTH
       () => _chatSimulator.SendMessage(new ReplyMessage(ReplyResult.Ok, Content: "OK")),
       () => _chatSimulator.ReceiveMessage(null), // BYE
-      () => _chatSimulator.ReceiveMessage(null)); // nothing received
+      () => _chatSimulator.ReceiveMessage("")); // nothing received
 
     Assert.Equal(
       [MsgType.Auth, MsgType.Reply, MsgType.Auth, MsgType.Reply, MsgType.Bye],
@@ -77,7 +76,7 @@ public class TcpChatClientTests {
       () => _chatSimulator.ReceiveMessage("/auth USER-1 SECRET TEST_NAME"), // AUTH
       () => _chatSimulator.SendMessage(new ReplyMessage(ReplyResult.Nok, Content: "NOK")),
       () => _chatSimulator.ReceiveMessage(null), // BYE
-      () => _chatSimulator.ReceiveMessage(null)); // nothing received
+      () => _chatSimulator.ReceiveMessage("")); // nothing received
 
     Assert.Equal(
       [MsgType.Auth, MsgType.Reply, MsgType.Bye],
@@ -91,7 +90,7 @@ public class TcpChatClientTests {
       () => _chatSimulator.SendMessage(new ReplyMessage(ReplyResult.Invalid, Content: "OK")),
       () => _chatSimulator.ReceiveMessage(""), // ERR
       () => _chatSimulator.ReceiveMessage(""), // BYE
-      () => _chatSimulator.ReceiveMessage(null)); // nothing
+      () => _chatSimulator.ReceiveMessage("")); // nothing received
 
     Assert.Equal([MsgType.Auth, MsgType.Reply, MsgType.Err, MsgType.Bye],
       _chatSimulator.ExchangedMessages);
@@ -103,7 +102,7 @@ public class TcpChatClientTests {
       () => _chatSimulator.ReceiveMessage("/auth USER SECRET TEST_NAME"), // AUTH
       () => _chatSimulator.SendMessage(new ReplyMessage(ReplyResult.Ok, Content: "OK")),
       () => _chatSimulator.SendMessage(new ByeMessage()),
-      () => _chatSimulator.ReceiveMessage(null)); // nothing received
+      () => _chatSimulator.ReceiveMessage("")); // nothing received
 
     Assert.Equal(
       [MsgType.Auth, MsgType.Reply, MsgType.Bye],
@@ -116,7 +115,7 @@ public class TcpChatClientTests {
       () => _chatSimulator.ReceiveMessage("/auth USER SECRET TEST_NAME"), // AUTH
       () => _chatSimulator.SendMessage(new ReplyMessage(ReplyResult.Ok, Content: "OK")),
       () => _chatSimulator.ReceiveMessage(null), // BYE
-      () => _chatSimulator.ReceiveMessage(null)); // nothing received
+      () => _chatSimulator.ReceiveMessage("")); // nothing received
 
     Assert.Equal(
       [MsgType.Auth, MsgType.Reply, MsgType.Bye],
@@ -130,7 +129,7 @@ public class TcpChatClientTests {
       () => _chatSimulator.SendMessage(new ReplyMessage(ReplyResult.Ok, Content: "OK")),
       () => _chatSimulator.SendMessage(new ErrorMessage(DisplayName: "SERVER", Content: "ERROR")),
       () => _chatSimulator.ReceiveMessage(""), // BYE
-      () => _chatSimulator.ReceiveMessage(null)); // nothing received
+      () => _chatSimulator.ReceiveMessage("")); // nothing received
 
     Assert.Equal(
       [MsgType.Auth, MsgType.Reply, MsgType.Err, MsgType.Bye],
@@ -145,7 +144,7 @@ public class TcpChatClientTests {
       () => _chatSimulator.SendMessage(new InvalidMessage(Content: "INVALID MESSAGE")),
       () => _chatSimulator.ReceiveMessage(""), // ERR
       () => _chatSimulator.ReceiveMessage(""), // BYE
-      () => _chatSimulator.ReceiveMessage(null)); // nothing received
+      () => _chatSimulator.ReceiveMessage("")); // nothing received
 
     Assert.Equal([MsgType.Auth, MsgType.Reply, MsgType.Invalid, MsgType.Err, MsgType.Bye],
       _chatSimulator.ExchangedMessages);
@@ -161,7 +160,7 @@ public class TcpChatClientTests {
       () => _chatSimulator.SendMessage(new TextMessage("SERVER", "MESSAGE")),
       () => _chatSimulator.ReceiveMessage("TEST MESSAGE 2"), // MSG
       () => _chatSimulator.ReceiveMessage(null), // BYE
-      () => _chatSimulator.ReceiveMessage(null)); // nothing received
+      () => _chatSimulator.ReceiveMessage("")); // nothing received
 
     Assert.Equal([MsgType.Auth, MsgType.Reply, MsgType.Msg, MsgType.Msg, MsgType.Msg, MsgType.Bye],
       _chatSimulator.ExchangedMessages);
@@ -176,7 +175,7 @@ public class TcpChatClientTests {
       () => _chatSimulator.SendMessage(new ReplyMessage(ReplyResult.Ok, "OK")),
       () => _chatSimulator.ReceiveMessage("TEST MESSAGE"), // MSG
       () => _chatSimulator.ReceiveMessage(null), // BYE
-      () => _chatSimulator.ReceiveMessage(null)); // nothing received
+      () => _chatSimulator.ReceiveMessage("")); // nothing received
 
     Assert.Equal(
       [MsgType.Auth, MsgType.Reply, MsgType.Join, MsgType.Reply, MsgType.Msg, MsgType.Bye],
@@ -192,7 +191,7 @@ public class TcpChatClientTests {
       () => _chatSimulator.SendMessage(new ReplyMessage(ReplyResult.Ok, "NOK")),
       () => _chatSimulator.ReceiveMessage("TEST MESSAGE"), // MSG
       () => _chatSimulator.ReceiveMessage(null), // BYE
-      () => _chatSimulator.ReceiveMessage(null)); // nothing received
+      () => _chatSimulator.ReceiveMessage("")); // nothing received
 
     Assert.Equal(
       [MsgType.Auth, MsgType.Reply, MsgType.Join, MsgType.Reply, MsgType.Msg, MsgType.Bye],
@@ -208,7 +207,7 @@ public class TcpChatClientTests {
       () => _chatSimulator.SendMessage(new ReplyMessage(ReplyResult.Nok, "NOK")),
       () => _chatSimulator.ReceiveMessage(""), // ERR
       () => _chatSimulator.ReceiveMessage(""), // BYE
-      () => _chatSimulator.ReceiveMessage(null)); // nothing received
+      () => _chatSimulator.ReceiveMessage("")); // nothing received
 
     Assert.Equal(
       [MsgType.Auth, MsgType.Reply, MsgType.Msg, MsgType.Reply, MsgType.Err, MsgType.Bye],
@@ -223,7 +222,7 @@ public class TcpChatClientTests {
       () => _chatSimulator.SendMessage(new InvalidMessage(Content: "INVALID MESSAGE")),
       () => _chatSimulator.ReceiveMessage(""), // ERR
       () => _chatSimulator.ReceiveMessage("DO NOT SEND THIS MESSAGE"), // BYE
-      () => _chatSimulator.ReceiveMessage(null)); // nothing received
+      () => _chatSimulator.ReceiveMessage("")); // nothing received
 
     Assert.Equal([MsgType.Auth, MsgType.Reply, MsgType.Invalid, MsgType.Err, MsgType.Bye],
       _chatSimulator.ExchangedMessages);

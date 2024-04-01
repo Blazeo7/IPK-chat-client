@@ -46,8 +46,11 @@ public class UdpClient(string hostname, ushort port, int timeout, int retries)
         await ClientSocket.ReceiveFromAsync(recBuffer, SocketFlags.None, _remoteIpEndPoint);
 
       Message recMessage = Message.FromUdpFormat(recBuffer);
-
+      
       Logger.Log("Client received", recMessage);
+      
+      // Update remote address endpoint after receiving reply message
+      _remoteIpEndPoint = receiveResult.RemoteEndPoint;
 
       // Handle Confirmation
       if (recMessage.MType is MsgType.Confirm) {
@@ -63,8 +66,6 @@ public class UdpClient(string hostname, ushort port, int timeout, int retries)
 
       // Handle Reply message
       if (recMessage.MType is MsgType.Reply) {
-        // Update remote address endpoint after receiving reply message
-        _remoteIpEndPoint = receiveResult.RemoteEndPoint;
 
         if (!CheckReplyMessage((ReplyMessage)recMessage)) {
           recMessage = new InvalidMessage(Content: "Got an invalid reply message");
