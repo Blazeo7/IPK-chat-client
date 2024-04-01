@@ -1,9 +1,9 @@
-﻿using ChatApp;
-using ChatApp.Enums;
+﻿using ChatApp.Enums;
 using ChatApp.Messages;
 using ChatApp.Tests.Servers;
 using System.Diagnostics;
 using System.Net.Sockets;
+using System.Runtime.InteropServices;
 
 namespace ChatApp.Tests;
 
@@ -71,7 +71,18 @@ public class ChatSimulator(Server server) {
 
 
   private async Task RunProcessAsync() {
-    string programPath = "ChatApp.exe";
+    string programPath;
+
+    // Check if the operating system is Windows
+    if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) {
+      programPath = "ChatApp.exe";
+    }
+    // Check if the operating system is Linux
+    else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux)) {
+      programPath = "ChatApp";
+    } else {
+      throw new PlatformNotSupportedException("This operating system is not supported.");
+    }
 
     _process.StartInfo.FileName = programPath;
     _process.StartInfo.RedirectStandardInput = true;
