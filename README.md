@@ -61,7 +61,7 @@ Mimo týchto metód trieda `Message` implementuje továrenské metódy `FromTcpF
 
 Testované boli serializácia, deserializácia a vypisovanie správ na štandardný alebo chybový výstup:
 
-**Výpis správ**
+#### Výpis správ
 
 Testuje, či správy boli užívateľovi vypísané v správnom formáte.
 
@@ -105,14 +105,8 @@ Testuje, či správy boli užívateľovi vypísané v správnom formáte.
 </table>
 
 <br>
-<div style="display: inline-block; width: 20px; height: 20px; background-color: #fbe9e9; vertical-align: middle;"></div> - štandardný chybový výstup
 
-<br>
-<div style="display: inline-block; width: 20px; height: 20px; background-color: #f3fded; vertical-align: middle;"></div> - štandardný výstup
-
-<br><br>
-
-**TCP**
+#### TCP
 
 Spoločné testy pre TCP na serializáciu aj deserializáciu:
 
@@ -162,7 +156,7 @@ Spoločné testy pre TCP na serializáciu aj deserializáciu:
 </tbody>
 </table>
 
-<br><br>
+<br>
 
 Ďalšie testy pre deserializáciu. Snahou je najmä overiť možnosť prijímania TCP správ v `CASE INSENSITIVE` formáte.
 
@@ -206,7 +200,7 @@ Spoločné testy pre TCP na serializáciu aj deserializáciu:
 
 <br><br>
 
-**UDP**
+#### UDP
 
 Testy pre serializáciu a deserializáciu UDP správ. Okrem formátu správy overuje serializovanie aj deserializovanie do `Network byte order`, to sa týka `Id` a `RefMsgId`.
 
@@ -237,7 +231,7 @@ Testy pre serializáciu a deserializáciu UDP správ. Okrem formátu správy ove
     <td class="tg-0pky">03 <span style="color:#009901">00 02</span> 67 65 6E 65 72 61 6C <span style="color:#FE0000">00</span> 61 6C 69 61 73 <span style="color:#FE0000">00</span></td>
   </tr>
   <tr>
-    <td class="tg-0pky">ByeMessage(<span style="color:#009901;background-color:#FFF">Id: 3)</span></td>
+    <td class="tg-0pky">ByeMessage(<span style="color:#009901">Id: 3)</span></td>
     <td class="tg-0pky">FF <span style="color:#009901">00 03</span></td>
   </tr>
   <tr>
@@ -245,7 +239,7 @@ Testy pre serializáciu a deserializáciu UDP správ. Okrem formátu správy ove
     <td class="tg-0pky">04 <span style="color:#009901">00 04</span> 61 6C 69 61 73 <span style="color:#FE0000">00</span> 74 65 73 74 20 6D 73 67 <span style="color:#FE0000">00</span></td>
   </tr>
   <tr>
-    <td class="tg-0pky">ReplyMessage(ReplyResult.Ok, "OK", <span style="color:#009901;background-color:#FFF">Id: 2</span>,<span style="color:#3166FF"> RefMsgId: 3</span>)</td>
+    <td class="tg-0pky">ReplyMessage(ReplyResult.Ok, "OK", <span style="color:#009901">Id: 2</span>,<span style="color:#3166FF"> RefMsgId: 3</span>)</td>
     <td class="tg-0pky">01 <span style="color:#009901">00 02</span> 01 <span style="color:#3166FF">00 03</span> 4F 4B <span style="color:#FE0000">00</span></td>
   </tr>
   <tr>
@@ -259,12 +253,6 @@ Testy pre serializáciu a deserializáciu UDP správ. Okrem formátu správy ove
 </tbody>
 </table>
 <br>
-
-<div style="display: inline-block; width: 20px; height: 20px; background-color: #009901; vertical-align: middle;"></div> - MsgId,
-<br>
-<div style="display: inline-block; width: 20px; height: 20px; background-color: #3166FF; vertical-align: middle;"></div> - RefMsgId,
-<br>
-<div style="display: inline-block; width: 20px; height: 20px; background-color: #FE0000; vertical-align: middle;"></div> - nulový znak ukončujúci reťazce.
 
 ## Užívateľské príkazy
 
@@ -377,11 +365,6 @@ Tabuľka nižšie popisuje aký bol zadaný vstup od užívateľa `INPUT` a v ak
 
 <br>
 
-*Očakávaný výstup z testovanej metódy `HandleCommand`*.
-<div style="display: inline-block; width: 20px; height: 20px; background-color: #ffffc7; vertical-align: middle;"></div> - navrátená správa
-<br>
-<div style="display: inline-block; width: 20px; height: 20px; background-color: #feeaf4; vertical-align: middle;"></div> - null
-
 ## Klient
 
 Oba klienti UDP aj TCP zdieľajú rovnaké správanie. Z toho dôvodu existuje rozhranie `IClient`, ktoré vymedzuje nutnosť implementovania metód charakteristický pre internetového klienta (zahŕňa aj server). Metódy, ktoré musia byť implementované všetkými klientami sú:
@@ -409,14 +392,16 @@ Pri volaní metódy `SetUpConnection` je na klientskom sockete zavolaná metóda
 
 Okrem naviazania na lokálny port sa vytvára vlákno pre neustále naslúchanie na obdržané správy od serveru. Toto zabezpečuje metóda `ContinuousReceiving`. Stará sa o prijímanie datagramov, posielanie potvrdení na prijaté správy a vyhodnocovanie `Confirm` a `Reply` správ. 
 
-**Zasialnie správ**
+#### Zasialnie správ
+
 Pri zasielaní správ metódou `SendMessage` sa najprv nastaví hodnota `_msgToBeConfirmed` na `Id` posielanej správy. Deje sa tak kvôli komunikácii s vláknom vykonávajúce metódu `ContinuousReceiving`. Upozorní ho, že má očakávať `Confirm` na danú správu. 
 
 Následne v prípade posielania `Join` alebo `Auth` správy sa nastaví `_expectedReplyId` na `Id` posielanej správy. z rovnakého dôvodu ako pri `Confirm`.
 
 Po zaslaní správy serveru sa nastaví `timeoutTask`, ktorý určuje čas, do kedy musí byť správa potvrdená. Toto vlákno je blokované dokiaľ nenastane uplynutie času na potvrdenie alebo, kým nebude správa potvdená. Správu potvrdzuje vlákno `ContinuousReceiving`, a to po prečítaní správy `Confirm` s `Id` rovnakým ako je nastavené v `_msgToBeConfirmed`. Po uplynutí času bez potvrdenia je správa opätovne zaslaná serveru. 
 
-**Prijímanie správ**
+#### Prijímanie správ
+
 Správy od serveru sú prijímané neustále. Aby neprišlo k strate prijatej správy, sú všetky správy (okrem `Confirm`) ukladané do fronty. Pri obdržaní správy sa vždy nastavuje adresa `_remoteEndPoint` serveru, s ktorý sa komunikuje podľa toho odkiaľ prišla správa. 
 
 Ak bola obdržaná správa typu `Confirm`, nastáva potvrdenie poslednej odoslanej správy. Ak sa `Id` potvrdenia zhoduje s `_msgToBeConfirmed` je uvoľnené vlákno starajúce sa o posielanie správ. V prípade nesprávneho `Id` je `Confirm` ignorovaný.
@@ -453,12 +438,12 @@ Klient môže mimo `Reply` obdržať iné správy, na ktoré reaguje nasledovne"
 ### Open state
 V tomto stave sú vytvorené 2 vlákna. Jedno je určené na prijímanie správ prostredníctvom `OpenStateReceiving` a druhé na zasielanie správ pomocou `OpenStateSending`. Zmena stavu sa uskutoční po tom ako aspoň jedno vlákno ukončí vykonávanie danej metódy. 
 
-**OpenStateSending**
+#### OpenStateSending
 Cyklicky číta užívateľský vstup a posiela správy serveru. Ak správa určená na zaslanie je `Msg` alebo `Join`, klient sa pokúsi túto správu zaslať serveru. V prípade chyby pri zasielaní správy, napr. neobdržaný `Confirm`, sa serveru zašle správa `Bye` a klient ukončí spojenie. 
 
 Pri zasielaní správy `Join` sa zablokuje možnosť posielania správ dokiaľ nebude toto vlákno uvoľnené. 
 
-**OpenStateReceiving**
+#### OpenStateReceiving
 V nekonečnej sľučke prijíma správy od serveru. Obdržané správy mimo `Reply`, `Err`, `Bye` a `Msg` vedú k nevalidnej správe od serveru. Dôsledkom toho je serveru zaslaná správa o obdržaní nevalidnej správy a prechod do stavu `Error` prostredníctvom metódy `TransitionToErrorState`. 
 
 Prijatie `Reply`, v momente keď to nie je očakávané vedie rovnako k prechodu do `Error` stavu.
@@ -473,7 +458,8 @@ Testy boli vykonávané prostredníctvom pseudo serverov, ktoré odpovedali tak 
 - Server - spustí server,
 - Časovač - ukončí simuláciu ak by nastal `Deadlock` pri testovaní a v prípade, že klientsky proces nie je ukončený, zabije ho.
 
-**ChatSimulator**
+#### ChatSimulator
+
 Pri testovaní komunikácie medzi klientom a serverom používa `ChatSimulator`, ktorý prostredníctvom callback funkcií ovláda server a aj klienta pomocou vkladania správ do jeho štandardného vstupu. 
 
 - `SendMessage` - metóda zašle správu klientovi od serveru.
@@ -496,9 +482,10 @@ Príklad použitia `ChatSimulator` pri testovaní:
 ```
 Napriek tomu, že na štandardom vstupe klienta nebolo nič (iba '\0', ktoré je ignorované), klient zaslal `Err` správu ako reakciu na obdržanú `InvalidMessage`. Rovnako následne zaslal `Bye`. Test ešte overuje, či skutočne klient nezaslal nejakú správu navyše. V TCP variante server obdrží správu o veľkosti 0, značiacu ukončenie spojenia klienta so serverom. V prípade UDP varianty server zostane čakať, kým mu klient nepošle správu, čo sa však nikdy neudeje, a teda test končí až po uplynutí časovaču.  
 
-**Spoločné testy pre TCP aj UDP klientov** - *UdpChatClientTests.cs*, *TcpChatClientTests.cs*
+#### Spoločné testy pre TCP aj UDP klientov - *UdpChatClientTests.cs*, *TcpChatClientTests.cs*
 
 Testy sú rovnaké pre TCP aj UDP variantu. Pre UDP sa však predpokladá zaslanie `Confirm` po každej správe - vždy na každú správu užívateľa server ihneď pošle `Confirm` a naopak.
+
 
 <style type="text/css">
 .tg  {border-collapse:collapse;border-spacing:0;margin:0px auto;}
@@ -506,20 +493,20 @@ Testy sú rovnaké pre TCP aj UDP variantu. Pre UDP sa však predpokladá zaslan
   overflow:hidden;padding:10px 5px;word-break:normal;}
 .tg th{border-color:black;border-style:solid;border-width:1px;font-family:Arial, sans-serif;font-size:14px;
   font-weight:normal;overflow:hidden;padding:10px 5px;word-break:normal;}
-.tg .tg-7fle{background-color:#efefef;font-weight:bold;text-align:center;vertical-align:top}
 .tg .tg-baqh{text-align:center;vertical-align:top}
-.tg .tg-7lio{background-color:#efefef;color:#FD6864;font-weight:bold;text-align:center;vertical-align:top}
+.tg .tg-8itu{background-color:#EFEFEF;color:#333333;font-weight:bold;text-align:center;vertical-align:top}
+.tg .tg-kxn2{background-color:#EFEFEF;font-weight:bold;text-align:center;vertical-align:top}
 .tg .tg-4k1p{color:#3531FF;text-align:left;vertical-align:top}
 .tg .tg-0lax{text-align:left;vertical-align:top}
 </style>
 <table class="tg">
 <thead>
   <tr>
-    <th class="tg-7lio"><span style="font-weight:bold;color:#000">Test Case</span></th>
-    <th class="tg-7fle"><span style="font-weight:bold">Message Exchanged</span></th>
-    <th class="tg-7fle"><span style="font-weight:bold">Observed State</span></th>
-    <th class="tg-7fle"><span style="font-weight:bold">Observed Server Action</span></th>
-    <th class="tg-7fle"><span style="font-weight:bold">Expected Client Behaviour</span></th>
+    <th class="tg-8itu"><span style="font-weight:bold">Test Case</span></th>
+    <th class="tg-kxn2"><span style="font-weight:bold">Message Exchanged</span></th>
+    <th class="tg-kxn2"><span style="font-weight:bold">Observed State</span></th>
+    <th class="tg-kxn2"><span style="font-weight:bold">Observed Server Action</span></th>
+    <th class="tg-kxn2"><span style="font-weight:bold">Expected Client Behaviour</span></th>
   </tr>
 </thead>
 <tbody>
@@ -637,6 +624,7 @@ Testy sú rovnaké pre TCP aj UDP variantu. Pre UDP sa však predpokladá zaslan
   </tr>
 </tbody>
 </table>
+
 <br>
 
 Popis stĺpcov:
@@ -652,7 +640,7 @@ Legenda:
 - `INV` - any invalid message,
 - `XREPLY` - invlalid `ReplyMessage` (s nevalidným `Result`).
 
-**Navyše testy pre Udp variantu** - *UdpChatClientTests.cs*
+#### Navyše testy pre Udp variantu - *UdpChatClientTests.cs*
 
 Pri komunikácii s použitím UDP protokolu môže nastať viacero situácii špecifických pre túto variantu. Pri testovaní bol zvolený počet `Retransmissions` na 1. 
 
@@ -662,20 +650,20 @@ Pri komunikácii s použitím UDP protokolu môže nastať viacero situácii šp
   overflow:hidden;padding:10px 5px;word-break:normal;}
 .tg th{border-color:black;border-style:solid;border-width:1px;font-family:Arial, sans-serif;font-size:14px;
   font-weight:normal;overflow:hidden;padding:10px 5px;word-break:normal;}
-.tg .tg-7fle{background-color:#efefef;font-weight:bold;text-align:center;vertical-align:top}
 .tg .tg-baqh{text-align:center;vertical-align:top}
-.tg .tg-7lio{background-color:#efefef;color:#FD6864;font-weight:bold;text-align:center;vertical-align:top}
+.tg .tg-8itu{background-color:#EFEFEF;color:#333333;font-weight:bold;text-align:center;vertical-align:top}
+.tg .tg-kxn2{background-color:#EFEFEF;font-weight:bold;text-align:center;vertical-align:top}
 .tg .tg-4k1p{color:#3531FF;text-align:left;vertical-align:top}
 .tg .tg-0lax{text-align:left;vertical-align:top}
 </style>
 <table class="tg">
 <thead>
   <tr>
-    <th class="tg-7lio"><span style="font-weight:bold;color:#000">Test Case</span></th>
-    <th class="tg-7fle"><span style="font-weight:bold">Message Exchanged</span></th>
-    <th class="tg-7fle"><span style="font-weight:bold">Observed State</span></th>
-    <th class="tg-7fle"><span style="font-weight:bold">Observed Server action</span></th>
-    <th class="tg-7fle"><span style="font-weight:bold">Expected Client Behaviour</span></th>
+    <th class="tg-8itu"><span style="font-weight:bold">Test Case</span></th>
+    <th class="tg-kxn2"><span style="font-weight:bold">Message Exchanged</span></th>
+    <th class="tg-kxn2"><span style="font-weight:bold">Observed State</span></th>
+    <th class="tg-kxn2"><span style="font-weight:bold">Observed Server action</span></th>
+    <th class="tg-kxn2"><span style="font-weight:bold">Expected Client Behaviour</span></th>
   </tr>
 </thead>
 <tbody>
@@ -737,7 +725,6 @@ Pri komunikácii s použitím UDP protokolu môže nastať viacero situácii šp
   </tr>
 </tbody>
 </table>
-<br>
 
 Legenda (platí rovnaká konvencia ako v tabuľke hore):
 - `CNF` - potvrdzovacia správa,
