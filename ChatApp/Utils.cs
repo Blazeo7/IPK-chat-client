@@ -16,14 +16,14 @@ public class Utils {
     foreach (var param in parameters) {
       if (param is string) {
         byte[] stringBytes = Encoding.ASCII.GetBytes(param);
-      writer.Write(stringBytes);
-      writer.Write((byte)0);
+        writer.Write(stringBytes);
+        writer.Write((byte)0);
       } else if (param is ushort) {
         // Indices in network byte order
         writer.Write(HostToNetworkOrder(param));
       } else {
         writer.Write(param);
-    }
+      }
     }
 
     // Get the resulting byte array
