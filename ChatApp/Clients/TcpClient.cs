@@ -7,6 +7,8 @@ using ChatApp.Messages;
 namespace ChatApp.Clients;
 
 public class TcpClient(string hostname, ushort port) : BaseClient(hostname, port) {
+  private static readonly int BufferSize = 2048;
+
   private readonly Queue<string> _receivedMessages = [];
   private string _incompleteMessage = "";
 
@@ -29,7 +31,7 @@ public class TcpClient(string hostname, ushort port) : BaseClient(hostname, port
 
 
   public override async Task<Message> ReceiveMessage() {
-    byte[] buffer = new byte[2048];
+    byte[] buffer = new byte[BufferSize];
 
     if (_receivedMessages.Count == 0) {
       await ClientSocket.ReceiveAsync(buffer);
@@ -38,6 +40,8 @@ public class TcpClient(string hostname, ushort port) : BaseClient(hostname, port
     }
 
     string receivedMessage = Encoding.ASCII.GetString(buffer).TrimEnd('\0');
+
+    Logger.Log($"`{receivedMessage}`");
 
     ProcessReceivedStream(receivedMessage);
 
@@ -64,9 +68,8 @@ public class TcpClient(string hostname, ushort port) : BaseClient(hostname, port
 
     // Process remaining complete messages and handle any incomplete messages.
     for (int i = 1; i < messages.Length; i++) {
-      // If the current message does not end with "\n", it's incomplete.
-      // Save it for the next receive operation and break out of the loop.
-      if (!messages[i].EndsWith('\n')) {
+      // If the last message in buffer is incomplete save it.
+      if (!messages[i].EndsWith('\n') && receivedMessage.Length == BufferSize) {
         _incompleteMessage = messages[i];
         break;
       }
