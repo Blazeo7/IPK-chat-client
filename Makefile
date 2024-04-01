@@ -10,6 +10,10 @@ script:
 
 clean:
 	dotnet clean
-	rm -f ipk24chat-client
+	@rm -f ipk24chat-client
 
-.PHONY: all build script
+test:
+	@echo "Running tests..."
+	dotnet test
+
+.PHONY: all build script test
