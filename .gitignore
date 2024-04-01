@@ -3,6 +3,8 @@
 ##
 ## Get latest from `dotnet new gitignore`
 
+ipk24chat-client
+
 # dotenv files
 .env
 
