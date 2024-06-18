@@ -67,16 +67,6 @@ Testuje, či správy boli užívateľovi vypísané v správnom formáte.
 
 *MessagePrintingTests.cs*
 
-<style type="text/css">
-.tg  {border-collapse:collapse;border-spacing:0;margin:0px auto;}
-.tg td{border-color:black;border-style:solid;border-width:1px;font-family:Arial, sans-serif;font-size:14px;
-  overflow:hidden;padding:10px 5px;word-break:normal;}
-.tg th{border-color:black;border-style:solid;border-width:1px;font-family:Arial, sans-serif;font-size:14px;
-  font-weight:normal;overflow:hidden;padding:10px 5px;word-break:normal;}
-.tg .tg-v0hj{background-color:#efefef;border-color:inherit;font-weight:bold;text-align:center;vertical-align:top}
-.tg .tg-mzcb{background-color:#fbe9e9;border-color:inherit;text-align:left;vertical-align:top}
-.tg .tg-6opx{background-color:#f3fded;border-color:inherit;text-align:left;vertical-align:top}
-</style>
 <table class="tg">
 <thead>
   <tr>
@@ -112,15 +102,6 @@ Spoločné testy pre TCP na serializáciu aj deserializáciu:
 
 *TcpMessageCoding.cs*
 
-<style type="text/css">
-.tg  {border-collapse:collapse;border-spacing:0;margin:0px auto;}
-.tg td{border-color:black;border-style:solid;border-width:1px;font-family:Arial, sans-serif;font-size:14px;
-  overflow:hidden;padding:10px 5px;word-break:normal;}
-.tg th{border-color:black;border-style:solid;border-width:1px;font-family:Arial, sans-serif;font-size:14px;
-  font-weight:normal;overflow:hidden;padding:10px 5px;word-break:normal;}
-.tg .tg-v0hj{background-color:#efefef;border-color:inherit;font-weight:bold;text-align:center;vertical-align:top}
-.tg .tg-0pky{border-color:inherit;text-align:left;vertical-align:top}
-</style>
 <table class="tg">
 <thead>
   <tr>
@@ -162,15 +143,6 @@ Spoločné testy pre TCP na serializáciu aj deserializáciu:
 
 *TcpMessageCoding.cs*
 
-<style type="text/css">
-.tg  {border-collapse:collapse;border-spacing:0;margin:0px auto;}
-.tg td{border-color:black;border-style:solid;border-width:1px;font-family:Arial, sans-serif;font-size:14px;
-  overflow:hidden;padding:10px 5px;word-break:normal;}
-.tg th{border-color:black;border-style:solid;border-width:1px;font-family:Arial, sans-serif;font-size:14px;
-  font-weight:normal;overflow:hidden;padding:10px 5px;word-break:normal;}
-.tg .tg-v0hj{background-color:#efefef;border-color:inherit;font-weight:bold;text-align:center;vertical-align:top}
-.tg .tg-0pky{border-color:inherit;text-align:left;vertical-align:top}
-</style>
 <table class="tg">
 <thead>
   <tr>
@@ -205,15 +177,7 @@ Spoločné testy pre TCP na serializáciu aj deserializáciu:
 Testy pre serializáciu a deserializáciu UDP správ. Okrem formátu správy overuje serializovanie aj deserializovanie do `Network byte order`, to sa týka `Id` a `RefMsgId`.
 
 *UdpMessageCoding.cs*
-<style type="text/css">
-.tg  {border-collapse:collapse;border-spacing:0;margin:0px auto;}
-.tg td{border-color:black;border-style:solid;border-width:1px;font-family:Arial, sans-serif;font-size:14px;
-  overflow:hidden;padding:10px 5px;word-break:normal;}
-.tg th{border-color:black;border-style:solid;border-width:1px;font-family:Arial, sans-serif;font-size:14px;
-  font-weight:normal;overflow:hidden;padding:10px 5px;word-break:normal;}
-.tg .tg-pg6v{background-color:#EFEFEF;border-color:inherit;font-weight:bold;text-align:center;vertical-align:top}
-.tg .tg-0pky{border-color:inherit;text-align:left;vertical-align:top}
-</style>
+
 <table class="tg">
 <thead>
   <tr>
@@ -272,18 +236,6 @@ Tabuľka nižšie popisuje aký bol zadaný vstup od užívateľa `INPUT` a v ak
 
 *UserCommandHanlderTests.cs*
 
-<style type="text/css">
-.tg  {border-collapse:collapse;border-spacing:0;margin:0px auto;}
-.tg td{border-color:black;border-style:solid;border-width:1px;font-family:Arial, sans-serif;font-size:14px;
-  overflow:hidden;padding:10px 5px;word-break:normal;}
-.tg th{border-color:black;border-style:solid;border-width:1px;font-family:Arial, sans-serif;font-size:14px;
-  font-weight:normal;overflow:hidden;padding:10px 5px;word-break:normal;}
-.tg .tg-v0hj{background-color:#efefef;border-color:inherit;font-weight:bold;text-align:center;vertical-align:top}
-.tg .tg-i55m{background-color:#feeaf4;border-color:inherit;text-align:left;vertical-align:top}
-.tg .tg-c3ow{border-color:inherit;text-align:center;vertical-align:top}
-.tg .tg-0pky{border-color:inherit;text-align:left;vertical-align:top}
-.tg .tg-ncd7{background-color:#ffffc7;border-color:inherit;text-align:left;vertical-align:top}
-</style>
 <table class="tg">
 <thead>
   <tr>
@@ -487,18 +439,6 @@ Napriek tomu, že na štandardom vstupe klienta nebolo nič (iba '\0', ktoré je
 Testy sú rovnaké pre TCP aj UDP variantu. Pre UDP sa však predpokladá zaslanie `Confirm` po každej správe - vždy na každú správu užívateľa server ihneď pošle `Confirm` a naopak.
 
 
-<style type="text/css">
-.tg  {border-collapse:collapse;border-spacing:0;margin:0px auto;}
-.tg td{border-color:black;border-style:solid;border-width:1px;font-family:Arial, sans-serif;font-size:14px;
-  overflow:hidden;padding:10px 5px;word-break:normal;}
-.tg th{border-color:black;border-style:solid;border-width:1px;font-family:Arial, sans-serif;font-size:14px;
-  font-weight:normal;overflow:hidden;padding:10px 5px;word-break:normal;}
-.tg .tg-baqh{text-align:center;vertical-align:top}
-.tg .tg-8itu{background-color:#EFEFEF;color:#333333;font-weight:bold;text-align:center;vertical-align:top}
-.tg .tg-kxn2{background-color:#EFEFEF;font-weight:bold;text-align:center;vertical-align:top}
-.tg .tg-4k1p{color:#3531FF;text-align:left;vertical-align:top}
-.tg .tg-0lax{text-align:left;vertical-align:top}
-</style>
 <table class="tg">
 <thead>
   <tr>
@@ -644,18 +584,7 @@ Legenda:
 
 Pri komunikácii s použitím UDP protokolu môže nastať viacero situácii špecifických pre túto variantu. Pri testovaní bol zvolený počet `Retransmissions` na 1. 
 
-<style type="text/css">
-.tg  {border-collapse:collapse;border-spacing:0;margin:0px auto;}
-.tg td{border-color:black;border-style:solid;border-width:1px;font-family:Arial, sans-serif;font-size:14px;
-  overflow:hidden;padding:10px 5px;word-break:normal;}
-.tg th{border-color:black;border-style:solid;border-width:1px;font-family:Arial, sans-serif;font-size:14px;
-  font-weight:normal;overflow:hidden;padding:10px 5px;word-break:normal;}
-.tg .tg-baqh{text-align:center;vertical-align:top}
-.tg .tg-8itu{background-color:#EFEFEF;color:#333333;font-weight:bold;text-align:center;vertical-align:top}
-.tg .tg-kxn2{background-color:#EFEFEF;font-weight:bold;text-align:center;vertical-align:top}
-.tg .tg-4k1p{color:#3531FF;text-align:left;vertical-align:top}
-.tg .tg-0lax{text-align:left;vertical-align:top}
-</style>
+
 <table class="tg">
 <thead>
   <tr>
